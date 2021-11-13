@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <title>Device list</title>
+        {% load static %}
+        <!-- Bootstrap CSS file -->
+        <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}"/>
+        <!-- Main css file -->
+        <link rel="stylesheet" href="{% static 'css/style.css' %}"/>
+        <!-- Font Awesome CSS -->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+        <!-- Fonts -->
+        <link rel="preconnect" href="https://fonts.gstatic.com">
+        <link href="https://fonts.googleapis.com/css2?family=Caveat&family=Langar&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Caveat&family=Langar&family=Open+Sans&display=swap" rel="stylesheet">
+        <!-- Main css file 
+        <link rel="stylesheet" type="text/css" href="static/css/style.css">-->
+         <!-- JS files: jQuery first, then Popper.js, then Bootstrap JS -->
+        <!-- <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script> -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+        <!-- Main jQuery file -->
+        <script src="{% static 'js/jquery.js' %}"></script>
+    </head>
+<body>
+            <!-- Navigation bar'as -->
+        <nav class="navbar navbar-expand-md navbar-dark bg-dark mb-3 navbar-fixed-top">
+            <!-- Logotipas -->
+            <a href="https://openwrt.org/">
+                <img src="{% static 'img/logo.png' %}">
+            </a>     
+            <!-- Navigation Bar Mygtukas -->  
+            <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbarCollapse"><span class="navbar-toggler-icon"></span></button>
+            <!-- Navigation Bar turinys -->
+            <div id="navbarCollapse" class="collapse navbar-collapse justify-content-start">
+                <div class="navbar-nav">
+                    <li><a href="#" class="nav-item nav-link"><i class="fa fa-home"></i> Dashboard</a></li>
+                    <li><a href="#" class="nav-item nav-link"><i class="fa fa-desktop"></i> Device</a></li>
+                    <li><a href="#" class="nav-item nav-link"><i class="fa fa-gear"></i> Configuration</a></li>
+                    <li><a href="#" class="nav-item nav-link"><i class="fa fa-user"></i> User</a></li>      
+                    <li><a href="#" class="nav-item nav-link"><i class="fa fa-file"></i> Log</a></li>
+                    <li><a href="#" class="nav-item nav-link"><i class="fa fa-check"></i> About</a></li>
+                    <li><a href="#" class="nav-item nav-link"><i class="fa fa-envelope"></i> Contact</a></li>
+                </div>
+
+                <!-- log in and register -->
+                    <ul class="navbar-nav ml-auto">
+                        <a href="#" target="_blank" class="nav-item nav-link" id="registerLink">Register</a>
+                        <a href="#" target="_blank" class="nav-item nav-link" id="loginLink">Log in</a>
+                    </ul>
+                </div>
+            </nav>
+<div class="container body-content">
+
+        <div class="jumbotron">
+            <h1>OpenWRT manager</h1>
+        </div>
+    
+
+
+<table class="table table-striped table-bordered table-sm">
+    <thead class="thead-dark">
+    <tr>
+        <th>Device MAC</th>
+        <th>Device model</th>
+        <th>Device name</th>
+        <th>Device description</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+{% for device in devices %}
+    <tr>
+        <td>{{ device.mac }}</td>
+        <td>{{ device.model }}</td>
+        <td>{{ device.name }}</td>
+        <td>{{ device.description }}</td>
+        <td>
+            <a href="/wrtapp/device/edit/{{ device.id }}">Edit</a>
+            <a href="/wrtapp/device/delete/{{ device.id }}">Delete</a>
+        </td>
+    </tr>
+{% endfor %}
+    </tbody>
+</table>
+</div>
+<br>
+<br>
+<center><a href="/wrtapp/device/create" class="btn btn-primary">Add New Device</a></center>
+<!-- Footer -->
+        <footer id="footer">
+            <div class="container">
+                <h3>OpenWRT Manager</h3>
+
+            <!-- Copyright -->
+                <div class="copyright">
+                    &copy; Copyright <strong><span>OpenWRT<b>Manager</b></span></strong> 2021. 
+                    <p>All rights reserved.</p>
+                </div>
+            </div>
+        </footer>
+
+        <!-- End Footer -->
+
+        <!-- Back to top -->
+        <a href="#" class="back-to-top"><i class="fa fa-chevron-up"></i></a>
+        <!-- End back to top -->
+    </body>
+</html>
+</body>
+</html>
