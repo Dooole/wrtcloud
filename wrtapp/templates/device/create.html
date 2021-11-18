@@ -3,50 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Edit</title>
+    <title>Create</title>
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}"/>
     <link rel="stylesheet" href="{% static 'css/style.css' %}"/>
 </head>
 <body>
-<form method="POST" class="post-form" action="/wrtapp/device/update/{{device.id}}">
+<form method="POST" class="post-form" action="/wrtapp/device/create">
         {% csrf_token %}
     <div class="container">
 <br>
     <div class="form-group row">
     <label class="col-sm-1 col-form-label"></label>
     <div class="col-sm-4">
-    <h3>Update Details</h3>
+    <h3>Enter Details</h3>
     </div>
   </div>
     <div class="form-group row">
-    <label class="col-sm-2 col-form-label">Device MAC:</label>
+    <label class="col-sm-2 col-form-label">MAC</label>
     <div class="col-sm-4">
-        <input type="text" name="mac" id="id_mac" required maxlength="24" value="{{ device.mac }}"/>
+      {{ form.mac }}
     </div>
   </div>
   <div class="form-group row">
-    <label class="col-sm-2 col-form-label">Device model:</label>
+    <label class="col-sm-2 col-form-label">Model</label>
     <div class="col-sm-4">
-        <input type="text" name="model" id="id_model" required maxlength="32" value="{{ device.model }}" />
+      {{ form.name }}
+    </div>  
+  </div>  
+    <div class="form-group row">
+    <label class="col-sm-2 col-form-label">Name</label>
+    <div class="col-sm-4">
+      {{ form.model }}
     </div>
   </div>
     <div class="form-group row">
-    <label class="col-sm-2 col-form-label">Device name:</label>
+    <label class="col-sm-2 col-form-label">Description</label>
     <div class="col-sm-4">
-        <input type="text" name="name" id="id_name" required maxlength="32" value="{{ device.name }}" />
-    </div>
-  </div>
-    <div class="form-group row">
-    <label class="col-sm-2 col-form-label">Device description:</label>
-    <div class="col-sm-4">
-        <input type="text" name="description" id="id_description" required maxlength="64" value="{{ device.description }}" />
+      {{ form.description }}
     </div>
   </div>
     <div class="form-group row">
     <label class="col-sm-1 col-form-label"></label>
     <div class="col-sm-4">
-    <button type="submit" class="btn btn-success">Update</button>
+    <button type="submit" class="btn btn-primary">Submit</button>
     </div>
   </div>
     </div>

@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block content %}
+<table class="table table-striped table-bordered table-sm">
+    <thead class="thead-dark">
+    <tr>
+        <th>MAC</th>
+        <th>Model</th>
+        <th>Name</th>
+        <th>Description</th>
+        <th></th>
+    </tr>
+    </thead>
+    <tbody>
+{% for device in devices %}
+    <tr>
+        <td>{{ device.mac }}</td>
+        <td>{{ device.model }}</td>
+        <td>{{ device.name }}</td>
+        <td>{{ device.description }}</td>
+        <td>
+            <a href="/wrtapp/device/edit/{{ device.id }}">Edit</a>
+            <a href="/wrtapp/device/delete/{{ device.id }}">Delete</a>
+        </td>
+    </tr>
+{% endfor %}
+    </tbody>
+</table>
+{% endblock %}

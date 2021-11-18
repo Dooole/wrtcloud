@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block content %}
+<table class="table table-striped table-bordered table-sm">
+    <thead class="thead-dark">
+    <tr>
+        <th>MAC</th>
+        <th>Hostname</th>
+        <th>IP</th>
+        <th>Netmask</th>
+        <th>Gateway</th>
+        <th>DNS1</th>
+        <th>DNS2</th>
+        <th></th>
+    </tr>
+    </thead>
+    <tbody>
+{% for config in configs %}
+    <tr>
+        <td>{{ config.device.mac }}</td>
+        <td>{{ config.hostname }}</td>
+        <td>{{ config.ip }}</td>
+        <td>{{ config.netmask }}</td>
+        <td>{{ config.gateway }}</td>
+        <td>{{ config.dns1 }}</td>
+        <td>{{ config.dns2 }}</td>
+        <td>
+            <a href="/wrtapp/configuration/edit/{{ config.device.id }}">Edit</a>
+        </td>
+    </tr>
+{% endfor %}
+    </tbody>
+</table>
+{% endblock %}

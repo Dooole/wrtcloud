@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block content %}  
+<table class="table table-striped table-bordered table-sm">
+    <thead class="thead-dark">
+    <tr>
+        <th>MAC</th>
+        <th>Status</th>
+        <th>CPU load</th>
+        <th>Memory usage</th>
+        <th></th>
+    </tr>
+    </thead>
+    <tbody>
+{% for stat in stats %}
+    <tr>
+        <td>{{ stat.device.mac }}</td>
+        <td>{{ stat.status }}</td>
+        <td>{{ stat.cpu_load }}</td>
+        <td>{{ stat.memory_usage }}</td>
+        <td>
+            <a href="/wrtapp/statistics/delete/{{ stats.device.id }}">Delete</a>
+        </td>
+    </tr>
+{% endfor %}
+    </tbody>
+</table>
+{% endblock %}
