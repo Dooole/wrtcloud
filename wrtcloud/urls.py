@@ -20,5 +20,5 @@ from wrtapp import views
 urlpatterns = [
 	path('admin/', admin.site.urls),
 	path('wrtapp/', include('wrtapp.urls')),
-	re_path(r'^.*$', views.deviceView.show),
+	re_path(r'^.*$', views.statsView.show),
 ]
