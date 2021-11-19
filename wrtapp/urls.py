@@ -1,5 +1,7 @@
+from django.views.decorators.csrf import csrf_exempt
 from django.urls import path
 from wrtapp import views
+from wrtapp import provision
 
 urlpatterns = [
 	# Devices
@@ -18,4 +20,6 @@ urlpatterns = [
 	# Log
 	path('log/show', views.logView.show),
 	path('log/delete/<int:id>', views.logView.delete),
+	# Provision
+	path('provisioning', csrf_exempt(provision.ops.process)),
 ]
