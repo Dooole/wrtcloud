@@ -1,6 +1,17 @@
-from django.shortcuts import render, redirect
-from wrtapp.forms import DeviceForm, ConfigurationForm
-from wrtapp.models import Device, Configuration, Statistics, Log
+from django.shortcuts import render
+from django.shortcuts import redirect
+
+from wrtapp.forms import DeviceForm
+from wrtapp.forms import ConfigurationForm
+
+from wrtapp.models import Device
+from wrtapp.models import Configuration
+from wrtapp.models import Statistics
+from wrtapp.models import Log
+
+from wrtapp.logger import Logger
+
+LOGGER = Logger(__name__)
 
 class DeviceView:
 	def create(self, request):
@@ -11,7 +22,9 @@ class DeviceView:
 					form.save()
 					return redirect('/wrtapp/device/show')
 				except:
-					pass
+					LOGGER.error('Failed to save device form')
+			else:
+				LOGGER.error('Invalid device form: {}'.format(str(form.errors)))
 		else:
 			form = DeviceForm()
 		return render(request, 'device/create.html', {'form': form})
@@ -28,14 +41,22 @@ class DeviceView:
 		device = Device.objects.get(id=id)
 		form = DeviceForm(request.POST, instance = device)
 		if form.is_valid():
-			form.save()
-			return redirect('/wrtapp/device/show')
+			try:
+				form.save()
+				return redirect('/wrtapp/device/show')
+			except:
+				LOGGER.error('Failed to save device form')
+		else:
+			LOGGER.error('Invalid device form: {}'.format(str(form.errors)))
 		return render(request, 'device/edit.html', {'device': device})
 
 	def delete(self, request, id):
 		device = Device.objects.get(id=id)
-		device.delete()
-		return redirect('/wrtapp/device/show')
+		try:
+			device.delete()
+			return redirect('/wrtapp/device/show')
+		except:
+			LOGGER.error('Failed to delete device')
 
 class ConfigurationView:
 	def show(self, request):
@@ -50,10 +71,13 @@ class ConfigurationView:
 		config = Configuration.objects.get(device_id=id)
 		form = ConfigurationForm(request.POST, instance = config)
 		if form.is_valid():
-			form.save()
-			return redirect('/wrtapp/configuration/show')
+			try:
+				form.save()
+				return redirect('/wrtapp/configuration/show')
+			except:
+				LOGGER.error('Failed to save config form')
 		else:
-			print(form.errors)
+			LOGGER.error('Invalid config form: {}'.format(str(form.errors)))
 		return render(request, 'config/edit.html', {'config': config})
 
 class StatisticsView:
@@ -63,8 +87,11 @@ class StatisticsView:
 
 	def delete(self, request, id):
 		stat = Statistics.objects.get(device_id=id)
-		stat.delete()
-		return redirect('/wrtapp/statistics/show')
+		try:
+			stat.delete()
+			return redirect('/wrtapp/statistics/show')
+		except:
+			LOGGER.error('Failed to delete stats')
 
 class LogView:
 	def show(self, request):
@@ -73,8 +100,11 @@ class LogView:
 
 	def delete(self, request, id):
 		log = Log.objects.get(id=id)
-		log.delete()
-		return redirect('/wrtapp/log/show')
+		try:
+			log.delete()
+			return redirect('/wrtapp/log/show')
+		except:
+			LOGGER.error('Failed to delete log')
 
 deviceView = DeviceView()
 configView = ConfigurationView()
