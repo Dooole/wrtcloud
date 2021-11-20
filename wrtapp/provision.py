@@ -11,6 +11,8 @@ from wrtapp.models import Device
 from wrtapp.models import Configuration
 from wrtapp.models import Statistics
 
+from wrtapp.logger import Logger
+
 from django.conf import settings
 
 PROV_SCHEMA = {
@@ -38,18 +40,23 @@ PROV_SCHEMA = {
 	'token': r'^[a-fA-F0-9]{64}$'
 }
 
+LOGGER = Logger(__name__)
+
 def data_is_valid(schema, data):
 	for key in schema:
 		if key in data:
 			if isinstance(schema[key], dict):
 				if not isinstance(data[key], dict):
+					LOGGER.error('No dict required by schema')
 					return False
 				elif not data_is_valid(schema[key], data[key]):
 					return False
 			else:
 				if not re.search(schema[key], str(data[key])):
+					LOGGER.error('Invalid value by schema')
 					return False
 		else:
+			LOGGER.error('No key required by schema')
 			return False
 	return True
 
@@ -58,6 +65,7 @@ def token_is_valid(token):
 	hash.update(bytearray(settings.PROVISIONING_PASSWORD, 'utf8'))
 
 	if hash.hexdigest() != token:
+		LOGGER.error('Password hash mismatch')
 		return False
 
 	return True
@@ -70,12 +78,13 @@ def register_device(data):
 	except Device.DoesNotExist:
 		device = None
 	except:
+		LOGGER.error('Failed to get device for register')
 		return False
 	if device:
-		# Already registered
+		LOGGER.dev_debug('Device already exists', device)
 		return True
 
-	# Create device entry
+	LOGGER.dev_debug('Adding new device', device)
 	device = Device(
 		mac = mac,
 		model = reqst['model'],
@@ -85,9 +94,10 @@ def register_device(data):
 	try:
 		device.save()
 	except:
+		LOGGER.dev_error('Failed to save device', device)
 		return False
 
-	# Also create initial config
+	LOGGER.dev_debug('Initializing config', device)
 	cfg = data['configuration']
 	config = Configuration(
 		device = device,
@@ -101,6 +111,7 @@ def register_device(data):
 	try:
 		config.save()
 	except:
+		LOGGER.dev_error('Failed to save config', device)
 		return False
 
 	return True
@@ -111,7 +122,7 @@ def update_stats(data):
 	try:
 		device = Device.objects.get(mac=mac)
 	except:
-		# Device must exist.
+		LOGGER.error('Failed to get device for stats')
 		return False
 
 	try:
@@ -119,16 +130,16 @@ def update_stats(data):
 	except Statistics.DoesNotExist:
 		stat = None
 	except:
-		# Other failure.
+		LOGGER.dev_error('Failed to get stats', device)
 		return False
 
 	if stat:
-		# Update existing stats.
+		LOGGER.dev_debug('Updating stats', device)
 		stat.status = reqst['status']
 		stat.cpu_load = reqst['cpu_load']
 		stat.memory_usage = reqst['memory_usage']
 	else:
-		# Create new stats.
+		LOGGER.dev_debug('Creating stats', device)
 		stat = Statistics(
 			device = device,
 			status = reqst['status'],
@@ -139,6 +150,7 @@ def update_stats(data):
 	try:
 		stat.save()
 	except:
+		LOGGER.dev_error('Failed to save stats', device)
 		return False
 
 	return True
@@ -152,11 +164,13 @@ def build_config(data):
 	try:
 		device = Device.objects.get(mac=mac)
 	except:
+		LOGGER.error('Failed to get device for config')
 		return None
 
 	try:
 		dbcfg = Configuration.objects.get(device_id=device.id)
 	except:
+		LOGGER.dev_error('Failed to get config', device)
 		return None
 
 	changed = False
@@ -200,6 +214,7 @@ def build_config(data):
 		changed = True
 
 	if changed:
+		LOGGER.dev_debug('Config changed', device)
 		cfgdata['config_status'] = 'CHANGED'
 		cfgdata['configuration'] = cfg
 
@@ -211,18 +226,23 @@ class ProvisionOperations:
 			try:
 				reqjson = json.loads(request.body)
 			except:
+				LOGGER.error('Failed to deserialize post')
 				return HttpResponseBadRequest()
 
 			if not data_is_valid(PROV_SCHEMA, reqjson):
+				LOGGER.error('Invalid post data')
 				return HttpResponseBadRequest()
 
 			if not token_is_valid(reqjson['token']):
+				LOGGER.error('Invalid security token')
 				return HttpResponseForbidden()
 
 			if not register_device(reqjson):
+				LOGGER.error('Failed to register device')
 				return HttpResponseServerError()
 
 			if not update_stats(reqjson):
+				LOGGER.error('Failed to update stats')
 				return HttpResponseServerError()
 
 			config = build_config(reqjson)
@@ -230,11 +250,14 @@ class ProvisionOperations:
 				try:
 					respdata = json.dumps(config, sort_keys=True, indent=4)
 				except:
+					LOGGER.error('Failed to serialize config')
 					return HttpResponseServerError()
 				return HttpResponse(respdata, content_type='application/json')
 			else:
+				LOGGER.error('Config was not found')
 				return HttpResponseNotFound()
 		else:
+			LOGGER.error('Received not a POST request')
 			return HttpResponseBadRequest()
 
 ops = ProvisionOperations()
