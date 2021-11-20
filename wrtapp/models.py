@@ -34,11 +34,13 @@ class Statistics(models.Model):
 class Log(models.Model):
 	device = models.ForeignKey(
 		Device,
-		on_delete=models.CASCADE
+		on_delete=models.CASCADE,
+		null=True
 	)
 	user = models.ForeignKey(
 		User,
-		on_delete=models.CASCADE
+		on_delete=models.CASCADE,
+		null=True
 	)
 	severity = models.CharField(max_length=32)
 	message = models.CharField(max_length=128)
