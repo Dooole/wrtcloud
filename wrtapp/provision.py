@@ -10,7 +10,6 @@ from django.http import HttpResponseForbidden
 from wrtapp.models import Device
 from wrtapp.models import Configuration
 from wrtapp.models import Statistics
-from wrtapp.models import Log
 
 from django.conf import settings
 
@@ -64,8 +63,8 @@ def token_is_valid(token):
 	return True
 
 def register_device(data):
-	st = data['statistics']['system']
-	mac = st['mac'].upper()
+	reqst = data['statistics']['system']
+	mac = reqst['mac'].upper()
 	try:
 		device = Device.objects.get(mac=mac)
 	except Device.DoesNotExist:
@@ -79,7 +78,7 @@ def register_device(data):
 	# Create device entry
 	device = Device(
 		mac = mac,
-		model = st['model'],
+		model = reqst['model'],
 		name = 'Generic device',
 		description = 'Automatically added'
 	)
@@ -106,25 +105,135 @@ def register_device(data):
 
 	return True
 
+def update_stats(data):
+	reqst = data['statistics']['system']
+	mac = reqst['mac'].upper()
+	try:
+		device = Device.objects.get(mac=mac)
+	except:
+		# Device must exist.
+		return False
+
+	try:
+		stat = Statistics.objects.get(device_id=device.id)
+	except Statistics.DoesNotExist:
+		stat = None
+	except:
+		# Other failure.
+		return False
+
+	if stat:
+		# Update existing stats.
+		stat.status = reqst['status']
+		stat.cpu_load = reqst['cpu_load']
+		stat.memory_usage = reqst['memory_usage']
+	else:
+		# Create new stats.
+		stat = Statistics(
+			device = device,
+			status = reqst['status'],
+			cpu_load = reqst['cpu_load'],
+			memory_usage = reqst['memory_usage']
+		)
+
+	try:
+		stat.save()
+	except:
+		return False
+
+	return True
+
+def build_config(data):
+	reqst = data['statistics']['system']
+	reqcfg_sys = data['configuration']['system']
+	reqcfg_net = data['configuration']['network']
+
+	mac = reqst['mac'].upper()
+	try:
+		device = Device.objects.get(mac=mac)
+	except:
+		return None
+
+	try:
+		dbcfg = Configuration.objects.get(device_id=device.id)
+	except:
+		return None
+
+	changed = False
+	cfgdata = {'config_status': 'UNCHANGED'}
+	cfg = {}
+
+	if reqcfg_sys['hostname'] != dbcfg.hostname:
+		if not 'system' in cfg:
+			cfg['system'] = {}
+		cfg['system']['hostname'] = dbcfg.hostname
+		changed = True
+
+	if reqcfg_net['ip'] != dbcfg.ip:
+		if not 'network' in cfg:
+			cfg['network'] = {}
+		cfg['network']['ip'] = dbcfg.ip
+		changed = True
+
+	if reqcfg_net['netmask'] != dbcfg.netmask:
+		if not 'network' in cfg:
+			cfg['network'] = {}
+		cfg['network']['netmask'] = dbcfg.netmask
+		changed = True
+
+	if reqcfg_net['gateway'] != dbcfg.gateway:
+		if not 'network' in cfg:
+			cfg['network'] = {}
+		cfg['network']['gateway'] = dbcfg.gateway
+		changed = True
+
+	if reqcfg_net['dns1'] != dbcfg.dns1:
+		if not 'network' in cfg:
+			cfg['network'] = {}
+		cfg['network']['dns1'] = dbcfg.dns1
+		changed = True
+
+	if reqcfg_net['dns2'] != dbcfg.dns2:
+		if not 'network' in cfg:
+			cfg['network'] = {}
+		cfg['network']['dns2'] = dbcfg.dns2
+		changed = True
+
+	if changed:
+		cfgdata['config_status'] = 'CHANGED'
+		cfgdata['configuration'] = cfg
+
+	return cfgdata
+
 class ProvisionOperations():
 	def process(self, request):
 		if request.method == 'POST':
 			try:
-				jsondata = json.loads(request.body)
+				reqjson = json.loads(request.body)
 			except:
 				return HttpResponseBadRequest()
 
-			if not data_is_valid(PROV_SCHEMA, jsondata):
+			if not data_is_valid(PROV_SCHEMA, reqjson):
 				return HttpResponseBadRequest()
 
-			if not token_is_valid(jsondata['token']):
+			if not token_is_valid(reqjson['token']):
 				return HttpResponseForbidden()
 
-			if not register_device(jsondata):
+			if not register_device(reqjson):
 				return HttpResponseServerError()
 
-			data = json.dumps(jsondata, sort_keys=True, indent=4)
-			return HttpResponse(data, content_type='application/json')
+			if not update_stats(reqjson):
+				return HttpResponseServerError()
+
+			config = build_config(reqjson)
+			if config:
+				try:
+					respdata = json.dumps(config, sort_keys=True, indent=4)
+				except:
+					return HttpResponseServerError()
+				return HttpResponse(respdata, content_type='application/json')
+			else:
+				return HttpResponseNotFound()
 		else:
 			return HttpResponseBadRequest()
 
