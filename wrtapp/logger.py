@@ -4,7 +4,9 @@ from wrtapp.models import Log, Device
 from django.contrib.auth.models import User
 
 class Logger():
-	logger = logging.getLogger("wrtapp")
+	def __init__(self, name):
+		self.logger = logging.getLogger()
+		self.logname = name
 
 	def log_message(self, severity, msg, device, user):
 		if device and not isinstance(device, Device):
@@ -21,7 +23,7 @@ class Logger():
 		log.severity = severity
 		log.message = msg
 
-		logstr = '[WRTAPP]'
+		logstr = '[{}]'.format(self.logname.upper())
 		if user:
 			log.user = user
 			logstr = logstr + '[{}]'.format(user.username)
