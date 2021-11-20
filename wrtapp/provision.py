@@ -84,7 +84,6 @@ def register_device(data):
 		LOGGER.dev_debug('Device already exists', device)
 		return True
 
-	LOGGER.dev_debug('Adding new device', device)
 	device = Device(
 		mac = mac,
 		model = reqst['model'],
@@ -93,6 +92,7 @@ def register_device(data):
 	)
 	try:
 		device.save()
+		LOGGER.dev_debug('Added new device', device)
 	except:
 		LOGGER.dev_error('Failed to save device', device)
 		return False
