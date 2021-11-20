@@ -205,7 +205,7 @@ def build_config(data):
 
 	return cfgdata
 
-class ProvisionOperations():
+class ProvisionOperations:
 	def process(self, request):
 		if request.method == 'POST':
 			try:

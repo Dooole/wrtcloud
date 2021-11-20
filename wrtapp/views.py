@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from wrtapp.forms import DeviceForm, ConfigurationForm
 from wrtapp.models import Device, Configuration, Statistics, Log
 
-class DeviceView():
+class DeviceView:
 	def create(self, request):
 		if request.method == 'POST':
 			form = DeviceForm(request.POST)
@@ -37,7 +37,7 @@ class DeviceView():
 		device.delete()
 		return redirect('/wrtapp/device/show')
 
-class ConfigurationView():
+class ConfigurationView:
 	def show(self, request):
 		configs = Configuration.objects.all()
 		return render(request, 'config/index.html', {'configs': configs})
@@ -56,7 +56,7 @@ class ConfigurationView():
 			print(form.errors)
 		return render(request, 'config/edit.html', {'config': config})
 
-class StatisticsView():
+class StatisticsView:
 	def show(self, request):
 		stats = Statistics.objects.all()
 		return render(request, 'stats/index.html', {'stats': stats})
@@ -66,7 +66,7 @@ class StatisticsView():
 		stat.delete()
 		return redirect('/wrtapp/statistics/show')
 
-class LogView():
+class LogView:
 	def show(self, request):
 		logs = Log.objects.all()
 		return render(request, 'log/index.html', {'logs': logs})

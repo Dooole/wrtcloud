@@ -3,7 +3,7 @@ import logging
 from wrtapp.models import Log, Device
 from django.contrib.auth.models import User
 
-class Logger():
+class Logger:
 	def __init__(self, name):
 		self.logger = logging.getLogger()
 		self.logname = name
