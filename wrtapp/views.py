@@ -1,3 +1,5 @@
+import datetime
+
 from django.shortcuts import render
 from django.shortcuts import redirect
 
@@ -12,6 +14,7 @@ from wrtapp.models import Log
 from wrtapp.logger import Logger
 
 LOGGER = Logger(__name__)
+OFFLINE_THRESHOLD = 60 # Seconds.
 
 class DeviceView:
 	def create(self, request):
@@ -87,9 +90,17 @@ class ConfigurationView:
 			LOGGER.error('Invalid config form: {}'.format(str(form.errors)))
 		return render(request, 'config/edit.html', {'config': config})
 
+def check_status(stat):
+	now = datetime.datetime.now(stat.date.tzinfo)
+	diff = now - stat.date
+	if diff.total_seconds() > OFFLINE_THRESHOLD:
+		stat.status = "OFFLINE"
+
 class StatisticsView:
 	def show(self, request):
 		stats = Statistics.objects.all()
+		for stat in stats:
+			check_status(stat)
 		return render(request, 'stats/index.html', {'stats': stats})
 
 	def delete(self, request, id):
