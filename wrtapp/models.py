@@ -30,6 +30,7 @@ class Statistics(models.Model):
 	status = models.CharField(max_length=32)
 	cpu_load = models.FloatField()
 	memory_usage = models.FloatField()
+	date = models.DateTimeField(auto_now_add=True)
 
 class Log(models.Model):
 	device = models.ForeignKey(
