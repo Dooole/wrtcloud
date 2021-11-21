@@ -58,6 +58,13 @@ class DeviceView:
 		except:
 			LOGGER.error('Failed to delete device')
 
+	def deleteall(self, request):
+		try:
+			Device.objects.all().delete()
+		except:
+			LOGGER.error('Failed to delete all devices')
+		return redirect('/wrtapp/device/show')
+
 class ConfigurationView:
 	def show(self, request):
 		configs = Configuration.objects.all()
@@ -93,6 +100,13 @@ class StatisticsView:
 		except:
 			LOGGER.error('Failed to delete stats')
 
+	def deleteall(self, request):
+		try:
+			Statistics.objects.all().delete()
+		except:
+			LOGGER.error('Failed to delete all statistics')
+		return redirect('/wrtapp/statistics/show')
+
 class LogView:
 	def show(self, request):
 		logs = Log.objects.all()
@@ -106,7 +120,24 @@ class LogView:
 		except:
 			LOGGER.error('Failed to delete log')
 
+	def deleteall(self, request):
+		try:
+			Log.objects.all().delete()
+		except:
+			LOGGER.error('Failed to delete all logs')
+		return redirect('/wrtapp/log/show')
+
+class AboutView:
+	def show(self, request):
+		return render(request, 'about/index.html', {})
+
+class ContactView:
+	def show(self, request):
+		return render(request, 'contact/index.html', {})
+
 deviceView = DeviceView()
 configView = ConfigurationView()
 statsView = StatisticsView()
 logView = LogView()
+aboutView = AboutView()
+contactView = ContactView()
