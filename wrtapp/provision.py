@@ -19,7 +19,7 @@ PROV_SCHEMA = {
 	'statistics': {
 		'system': {
 			'mac': r'^([a-fA-F0-9]{2}[:|\-]?){6}$',
-			'model': r'^[\w\s\+]+$',
+			'model': r'^[\w\s\+\.\-]+$',
 			'cpu_load': r'^\d+\.\d+$',
 			'memory_usage': r'^\d+\.\d+$',
 			'status': r'^[\w]+$'
@@ -47,16 +47,16 @@ def data_is_valid(schema, data):
 		if key in data:
 			if isinstance(schema[key], dict):
 				if not isinstance(data[key], dict):
-					LOGGER.error('No dict required by schema')
+					LOGGER.error('No dict required by schema: {}'.format(key))
 					return False
 				elif not data_is_valid(schema[key], data[key]):
 					return False
 			else:
 				if not re.search(schema[key], str(data[key])):
-					LOGGER.error('Invalid value by schema')
+					LOGGER.error('Invalid value by schema: {}'.format(str(data[key])))
 					return False
 		else:
-			LOGGER.error('No key required by schema')
+			LOGGER.error('No key required by schema: {}'.format(key))
 			return False
 	return True
 
