@@ -92,7 +92,7 @@ def register_device(data):
 	)
 	try:
 		device.save()
-		LOGGER.dev_debug('Added new device', device)
+		LOGGER.dev_warning('Added new device', device)
 	except:
 		LOGGER.dev_error('Failed to save device', device)
 		return False

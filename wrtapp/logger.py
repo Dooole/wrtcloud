@@ -32,15 +32,17 @@ class Logger:
 			logstr = logstr + '[{}]'.format(device.mac)
 		logstr = logstr + ': {}'.format(msg)
 
-		try:
-			log.save()
-		except:
-			self.logger.error('failed to log to db')
-			return
-
 		if severity == 'ERROR':
+			try:
+				log.save()
+			except:
+				self.logger.error('failed to log error to db')
 			self.logger.error(logstr)
 		elif severity == 'WARNING':
+			try:
+				log.save()
+			except:
+				self.logger.error('failed to log warning to db')
 			self.logger.warning(logstr)
 		elif severity == 'DEBUG':
 			self.logger.debug(logstr)
