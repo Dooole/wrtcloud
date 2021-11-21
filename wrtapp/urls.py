@@ -19,6 +19,12 @@ urlpatterns = [
 	path('statistics/show', views.statsView.show),
 	path('statistics/delete/<int:id>', views.statsView.delete),
 	path('statistics/deleteall', views.statsView.deleteall),
+	# User
+	path('user/show', views.userView.show),
+	path('user/create', views.userView.create),
+	path('user/edit/<int:id>', views.userView.edit),
+	path('user/update/<int:id>', views.userView.update),
+	path('user/delete/<int:id>', views.userView.delete),
 	# Log
 	path('log/show', views.logView.show),
 	path('log/delete/<int:id>', views.logView.delete),

@@ -2,9 +2,11 @@ import datetime
 
 from django.shortcuts import render
 from django.shortcuts import redirect
+from django.contrib.auth.models import User
 
 from wrtapp.forms import DeviceForm
 from wrtapp.forms import ConfigurationForm
+from wrtapp.forms import UserCreateForm, UserUpdateForm
 
 from wrtapp.models import Device
 from wrtapp.models import Configuration
@@ -94,7 +96,7 @@ def check_status(stat):
 	now = datetime.datetime.now(stat.date.tzinfo)
 	diff = now - stat.date
 	if diff.total_seconds() > OFFLINE_THRESHOLD:
-		stat.status = "OFFLINE"
+		stat.status = 'OFFLINE'
 
 class StatisticsView:
 	def show(self, request):
@@ -117,6 +119,57 @@ class StatisticsView:
 		except:
 			LOGGER.error('Failed to delete all statistics')
 		return redirect('/wrtapp/statistics/show')
+
+class UserView:
+	def create(self, request):
+		if request.method == 'POST':
+			form = UserCreateForm(request.POST)
+			if form.is_valid():
+				try:
+					# Save form data and show users if OK
+					form.save()
+					return redirect('/wrtapp/user/show')
+				except:
+					LOGGER.error('Failed to save user form')
+			else:
+				LOGGER.error('Invalid user form: {}'.format(str(form.errors)))
+		else:
+			form = UserCreateForm()
+		# Show form again if NOT OK
+		return render(request, 'user/create.html', {'form': form})
+
+	def show(self, request):
+		users = User.objects.all()
+		return render(request, 'user/index.html', {'users': users})
+
+	def edit(self, request, id):
+		user = User.objects.get(id=id)
+		form = UserUpdateForm(request.POST)
+		return render(request, 'user/edit.html', {'form': form})
+
+	def update(self, request, id):
+		user = User.objects.get(id=id)
+		form = UserUpdateForm(request.POST, instance = user)
+		if form.is_valid():
+			try:
+				# form.save()
+				return redirect('/wrtapp/user/show')
+			except:
+				LOGGER.error('Failed to save user form')
+		else:
+			LOGGER.error('Invalid user form: {}'.format(str(form.errors)))
+		return render(request, 'user/edit.html', {'form': form})
+
+	def delete(self, request, id):
+		user = User.objects.get(id=id)
+		if user.username == 'admin':
+			LOGGER.error('Cannot delete built-in admin user')
+			return redirect('/wrtapp/user/show')
+		try:
+			user.delete()
+			return redirect('/wrtapp/user/show')
+		except:
+			LOGGER.error('Failed to delete user')
 
 class LogView:
 	def show(self, request):
@@ -149,6 +202,7 @@ class ContactView:
 deviceView = DeviceView()
 configView = ConfigurationView()
 statsView = StatisticsView()
+userView = UserView()
 logView = LogView()
 aboutView = AboutView()
 contactView = ContactView()
