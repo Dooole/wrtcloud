@@ -41,11 +41,17 @@ class LoginView:
 		return render(request=request, template_name='login.html', context={'login_form':form})
 
 	def logout(self, request):
+		if not request.user.is_authenticated:
+			return redirect('/wrtapp/login')
+
 		logout(request)
 		return redirect('/wrtapp/login')
 
 class DeviceView:
 	def create(self, request):
+		if not request.user.is_authenticated:
+			return redirect('/wrtapp/login')
+
 		if request.method == 'POST':
 			form = DeviceForm(request.POST)
 			if form.is_valid():
@@ -61,14 +67,23 @@ class DeviceView:
 		return render(request, 'device/create.html', {'form': form})
 
 	def show(self, request):
+		if not request.user.is_authenticated:
+			return redirect('/wrtapp/login')
+
 		devices = Device.objects.all()
 		return render(request, 'device/index.html', {'devices': devices})
 
 	def edit(self, request, id):
+		if not request.user.is_authenticated:
+			return redirect('/wrtapp/login')
+
 		device = Device.objects.get(id=id)
 		return render(request, 'device/edit.html', {'device': device})
 
 	def update(self, request, id):
+		if not request.user.is_authenticated:
+			return redirect('/wrtapp/login')
+
 		device = Device.objects.get(id=id)
 		form = DeviceForm(request.POST, instance = device)
 		if form.is_valid():
@@ -82,6 +97,9 @@ class DeviceView:
 		return render(request, 'device/edit.html', {'device': device})
 
 	def delete(self, request, id):
+		if not request.user.is_authenticated:
+			return redirect('/wrtapp/login')
+
 		device = Device.objects.get(id=id)
 		try:
 			device.delete()
@@ -90,6 +108,9 @@ class DeviceView:
 			LOGGER.error('Failed to delete device')
 
 	def deleteall(self, request):
+		if not request.user.is_authenticated:
+			return redirect('/wrtapp/login')
+
 		try:
 			Device.objects.all().delete()
 		except:
@@ -98,14 +119,23 @@ class DeviceView:
 
 class ConfigurationView:
 	def show(self, request):
+		if not request.user.is_authenticated:
+			return redirect('/wrtapp/login')
+
 		configs = Configuration.objects.all()
 		return render(request, 'config/index.html', {'configs': configs})
 
 	def edit(self, request, id):
+		if not request.user.is_authenticated:
+			return redirect('/wrtapp/login')
+
 		config = Configuration.objects.get(device_id=id)
 		return render(request, 'config/edit.html', {'config': config})
 
 	def update(self, request, id):
+		if not request.user.is_authenticated:
+			return redirect('/wrtapp/login')
+
 		config = Configuration.objects.get(device_id=id)
 		form = ConfigurationForm(request.POST, instance = config)
 		if form.is_valid():
@@ -126,12 +156,18 @@ def check_status(stat):
 
 class StatisticsView:
 	def show(self, request):
+		if not request.user.is_authenticated:
+			return redirect('/wrtapp/login')
+
 		stats = Statistics.objects.all()
 		for stat in stats:
 			check_status(stat)
 		return render(request, 'stats/index.html', {'stats': stats})
 
 	def delete(self, request, id):
+		if not request.user.is_authenticated:
+			return redirect('/wrtapp/login')
+
 		stat = Statistics.objects.get(device_id=id)
 		try:
 			stat.delete()
@@ -140,6 +176,9 @@ class StatisticsView:
 			LOGGER.error('Failed to delete stats')
 
 	def deleteall(self, request):
+		if not request.user.is_authenticated:
+			return redirect('/wrtapp/login')
+
 		try:
 			Statistics.objects.all().delete()
 		except:
@@ -148,6 +187,9 @@ class StatisticsView:
 
 class UserView:
 	def create(self, request):
+		if not request.user.is_authenticated:
+			return redirect('/wrtapp/login')
+
 		if request.method == 'POST':
 			form = UserCreateForm(request.POST)
 			if form.is_valid():
@@ -171,10 +213,16 @@ class UserView:
 		return render(request, 'user/create.html', {'form': form})
 
 	def show(self, request):
+		if not request.user.is_authenticated:
+			return redirect('/wrtapp/login')
+
 		users = User.objects.all()
 		return render(request, 'user/index.html', {'users': users})
 
 	def edit(self, request, id):
+		if not request.user.is_authenticated:
+			return redirect('/wrtapp/login')
+
 		user = User.objects.get(id=id)
 		# Protect password hash leak - wrap data
 		userData = {
@@ -188,6 +236,9 @@ class UserView:
 		return render(request, 'user/edit.html', {'form': form, 'userId': user.id})
 
 	def update(self, request, id):
+		if not request.user.is_authenticated:
+			return redirect('/wrtapp/login')
+
 		if request.method == 'POST':
 			user = User.objects.get(id=id)
 			form = UserUpdateForm(request.POST)
@@ -214,6 +265,9 @@ class UserView:
 		return render(request, 'user/edit.html', {'form': form})
 
 	def delete(self, request, id):
+		if not request.user.is_authenticated:
+			return redirect('/wrtapp/login')
+
 		user = User.objects.get(id=id)
 		if user.username == 'admin':
 			LOGGER.error('Cannot delete built-in admin user')
@@ -226,10 +280,16 @@ class UserView:
 
 class LogView:
 	def show(self, request):
+		if not request.user.is_authenticated:
+			return redirect('/wrtapp/login')
+
 		logs = Log.objects.all()
 		return render(request, 'log/index.html', {'logs': logs})
 
 	def delete(self, request, id):
+		if not request.user.is_authenticated:
+			return redirect('/wrtapp/login')
+
 		log = Log.objects.get(id=id)
 		try:
 			log.delete()
@@ -238,6 +298,9 @@ class LogView:
 			LOGGER.error('Failed to delete log')
 
 	def deleteall(self, request):
+		if not request.user.is_authenticated:
+			return redirect('/wrtapp/login')
+
 		try:
 			Log.objects.all().delete()
 		except:
@@ -246,10 +309,16 @@ class LogView:
 
 class AboutView:
 	def show(self, request):
+		if not request.user.is_authenticated:
+			return redirect('/wrtapp/login')
+
 		return render(request, 'about/index.html', {})
 
 class ContactView:
 	def show(self, request):
+		if not request.user.is_authenticated:
+			return redirect('/wrtapp/login')
+
 		return render(request, 'contact/index.html', {})
 
 loginView = LoginView()
