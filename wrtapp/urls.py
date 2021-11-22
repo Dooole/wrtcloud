@@ -4,6 +4,9 @@ from wrtapp import views
 from wrtapp import provision
 
 urlpatterns = [
+	# Login and logout
+	path('login', views.loginView.login),
+	path('logout', views.loginView.logout),
 	# Devices
 	path('device/show', views.deviceView.show),
 	path('device/create', views.deviceView.create),

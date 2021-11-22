@@ -30,27 +30,21 @@
             <!-- Navigation Bar content -->
             <div id="navbarCollapse" class="collapse navbar-collapse justify-content-start">
                 <div class="navbar-nav">
-                    <li><a href="/wrtapp/statistics/show" class="nav-item nav-link"><i class="fa fa-home"></i> Dashboard</a></li>
-                    <li><a href="/wrtapp/device/show" class="nav-item nav-link"><i class="fa fa-desktop"></i> Device</a></li>
-                    <li><a href="/wrtapp/configuration/show" class="nav-item nav-link"><i class="fa fa-gear"></i> Configuration</a></li>
-                    <li><a href="/wrtapp/user/show" class="nav-item nav-link"><i class="fa fa-user"></i> User</a></li>      
-                    <li><a href="/wrtapp/log/show" class="nav-item nav-link"><i class="fa fa-file"></i> Log</a></li>
-                    <li><a href="/wrtapp/about/show" class="nav-item nav-link"><i class="fa fa-address-card"></i> About</a></li>
-                    <li><a href="/wrtapp/contact/show" class="nav-item nav-link"><i class="fa fa-envelope"></i> Contact</a></li>
                 </div>
-                <!-- Log in and register -->
-                <ul class="navbar-nav ml-auto">
-                    <a href="/wrtapp/logout" target="_blank" class="nav-item nav-link" id="loginLink">Log out</a>
-                </ul>
             </div>
     </nav>
     <div class="container body-content">
-        {% block jumbotron %}
-        {% endblock %}
-        <div class="basetable">
-            {% block content %}
-            {% endblock %}
-        </div>   
+        <div class="jumbotron">
+            <h1 class="mb-4">OpenWRT manager</h1>
+        </div>
+            <div class="container py-5">
+              <h1>Login</h1>
+              <form method="POST">
+                {% csrf_token %}
+                {{ login_form }}
+                <button class="btn btn-primary" type="submit">Login</button>
+              </form>
+            </div>
     </div>
     <br>
     <br>

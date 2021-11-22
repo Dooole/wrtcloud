@@ -2,7 +2,9 @@ import datetime
 
 from django.shortcuts import render
 from django.shortcuts import redirect
+from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.models import User
+from django.contrib.auth.forms import AuthenticationForm
 
 from wrtapp.forms import DeviceForm
 from wrtapp.forms import ConfigurationForm
@@ -17,6 +19,48 @@ from wrtapp.logger import Logger
 
 LOGGER = Logger(__name__)
 OFFLINE_THRESHOLD = 60 # Seconds.
+
+class LoginView:
+	def login(self, request):
+		if request.method == 'POST':
+			form = AuthenticationForm(request, data=request.POST)
+			if form.is_valid():
+				username = form.cleaned_data.get('username')
+				password = form.cleaned_data.get('password')
+				user = authenticate(username=username, password=password)
+				if user:
+					login(request, user)
+					LOGGER.user_warning('Logged in', user)
+					return redirect('/wrtapp/statistics/show')
+				else:
+					LOGGER.error('Invalid username or password attempt')
+			else:
+				LOGGER.error('Invalid login form received')
+
+		form = AuthenticationForm()
+		return render(request=request, template_name='login.html', context={'login_form':form})
+
+	def logout(self, request):
+		logout(request)
+		return redirect('/wrtapp/login')
+
+		# if request.method == 'POST':
+		# 	form = AuthenticationForm(request, data=request.POST)
+		# 	if form.is_valid():
+		# 		username = form.cleaned_data.get('username')
+		# 		password = form.cleaned_data.get('password')
+		# 		user = authenticate(username=username, password=password)
+		# 		if user:
+		# 			login(request, user)
+		# 			LOGGER.user_warning('Logged in', user)
+		# 			return redirect('/wrtapp/statistics/show')
+		# 		else:
+		# 			LOGGER.error('Invalid username or password attempt')
+		# 	else:
+		# 		LOGGER.error('Invalid login form received')
+
+		# form = AuthenticationForm()
+		# return render(request=request, template_name='login.html', context={'login_form':form})
 
 class DeviceView:
 	def create(self, request):
@@ -174,8 +218,8 @@ class UserView:
 						try:
 							user.set_password(form.cleaned_data['newpassword'])
 						except:
-							LOGGER.error("Invalid password format", user)
-						LOGGER.user_warning("Changed password", user)
+							LOGGER.error('Invalid password format', user)
+						LOGGER.user_warning('Changed password', user)
 					user.save()
 
 					return redirect('/wrtapp/user/show')
@@ -226,6 +270,7 @@ class ContactView:
 	def show(self, request):
 		return render(request, 'contact/index.html', {})
 
+loginView = LoginView()
 deviceView = DeviceView()
 configView = ConfigurationView()
 statsView = StatisticsView()
