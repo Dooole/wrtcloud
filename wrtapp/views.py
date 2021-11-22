@@ -126,8 +126,14 @@ class UserView:
 			form = UserCreateForm(request.POST)
 			if form.is_valid():
 				try:
-					# Save form data and show users if OK
-					form.save()
+					user = User.objects.create_user(
+						form.cleaned_data['username'],
+						form.cleaned_data['email'],
+						form.cleaned_data['password']
+					)
+					user.is_superuser = form.cleaned_data['is_superuser']
+					user.save()
+
 					return redirect('/wrtapp/user/show')
 				except:
 					LOGGER.error('Failed to save user form')
@@ -144,20 +150,41 @@ class UserView:
 
 	def edit(self, request, id):
 		user = User.objects.get(id=id)
-		form = UserUpdateForm(request.POST)
-		return render(request, 'user/edit.html', {'form': form})
+		# Protect password hash leak - wrap data
+		userData = {
+			'username': user.username,
+			'email': user.email,
+			'is_administrator': user.is_superuser,
+		}
+		form = UserUpdateForm()
+		form.update(userData)
+
+		return render(request, 'user/edit.html', {'form': form, 'userId': user.id})
 
 	def update(self, request, id):
-		user = User.objects.get(id=id)
-		form = UserUpdateForm(request.POST, instance = user)
-		if form.is_valid():
-			try:
-				# form.save()
-				return redirect('/wrtapp/user/show')
-			except:
-				LOGGER.error('Failed to save user form')
+		if request.method == 'POST':
+			user = User.objects.get(id=id)
+			form = UserUpdateForm(request.POST)
+			if form.is_valid():
+				try:
+					user.username = form.cleaned_data['username']
+					user.email = form.cleaned_data['email']
+					user.is_superuser = form.cleaned_data['is_administrator']
+					if len(form.cleaned_data['newpassword']) > 0:
+						try:
+							user.set_password(form.cleaned_data['newpassword'])
+						except:
+							LOGGER.error("Invalid password format", user)
+						LOGGER.user_warning("Changed password", user)
+					user.save()
+
+					return redirect('/wrtapp/user/show')
+				except:
+					LOGGER.error('Failed to save user form')
+			else:
+				LOGGER.error('Invalid user form: {}'.format(str(form.errors)))
 		else:
-			LOGGER.error('Invalid user form: {}'.format(str(form.errors)))
+			form = UserUpdateForm()
 		return render(request, 'user/edit.html', {'form': form})
 
 	def delete(self, request, id):

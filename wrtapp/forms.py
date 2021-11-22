@@ -1,7 +1,8 @@
 from django import forms
-
-from wrtapp.models import Device, Configuration, Statistics, Log
 from django.contrib.auth.models import User
+
+from wrtapp.models import Device
+from wrtapp.models import Configuration
 
 class DeviceForm(forms.ModelForm):
 	class Meta:
@@ -18,18 +19,16 @@ class UserCreateForm(forms.ModelForm):
 		model = User
 		fields = ['username', 'email', 'password', 'is_superuser']
 
-	def save(self):
-		user = User.objects.create_user(
-			self.cleaned_data['username'],
-			self.cleaned_data['email'],
-			self.cleaned_data['password']
-		)
-		user.is_superuser = self.cleaned_data['is_superuser']
-		user.save()
-
+# This is a more basic form, detached form specific model.
 class UserUpdateForm(forms.Form):
+	# Input type text
 	username = forms.CharField()
 	email = forms.EmailField()
-	password = forms.CharField()
-	is_administrator = forms.BooleanField()
+	newpassword = forms.CharField(required = False)
+	# Input type checkbox
+	is_administrator = forms.BooleanField(required = False)
 
+	def update(self, userData):
+		self.initial['username'] = userData['username']
+		self.initial['email'] = userData['email']
+		self.initial['is_administrator'] = userData['is_administrator']
