@@ -1,4 +1,5 @@
-{% extends "base.html" %}
+{% extends "baseJumbotron.html" %}
+{% block title %}Dashboard{% endblock %}
 {% block content %}  
 <table class="table table-striped table-bordered table-sm">
     <thead class="thead-dark">
@@ -18,7 +19,10 @@
         <td>{{ stat.cpu_load }}</td>
         <td>{{ stat.memory_usage }}</td>
         <td>
-            <a href="/wrtapp/statistics/delete/{{ stat.device.id }}">Delete</a>
+           {% if is_administrator %}
+             <a href="/wrtapp/statistics/delete/{{ stat.device.id }}">Delete</a>
+           {% else %}
+           {% endif %}
         </td>
     </tr>
 {% endfor %}

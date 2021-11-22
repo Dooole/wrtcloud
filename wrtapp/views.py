@@ -74,21 +74,21 @@ class DeviceView:
 				LOGGER.error('Invalid device form: {}'.format(str(form.errors)))
 		else:
 			form = DeviceForm()
-		return render(request, 'device/create.html', {'form': form})
+		return render(request, 'device/create.html', {'form': form, 'is_administrator': request.user.is_superuser})
 
 	def show(self, request):
 		if not request.user.is_authenticated:
 			return redirect('/wrtapp/login')
 
 		devices = Device.objects.all()
-		return render(request, 'device/index.html', {'devices': devices})
+		return render(request, 'device/index.html', {'devices': devices, 'is_administrator': request.user.is_superuser})
 
 	def edit(self, request, id):
 		if not request.user.is_authenticated:
 			return redirect('/wrtapp/login')
 
 		device = Device.objects.get(id=id)
-		return render(request, 'device/edit.html', {'device': device})
+		return render(request, 'device/edit.html', {'device': device, 'is_administrator': request.user.is_superuser})
 
 	def update(self, request, id):
 		if not request.user.is_authenticated:
@@ -104,7 +104,7 @@ class DeviceView:
 				LOGGER.error('Failed to save device form')
 		else:
 			LOGGER.error('Invalid device form: {}'.format(str(form.errors)))
-		return render(request, 'device/edit.html', {'device': device})
+		return render(request, 'device/edit.html', {'device': device, 'is_administrator': request.user.is_superuser})
 
 	def delete(self, request, id):
 		if not request.user.is_authenticated:
@@ -139,14 +139,14 @@ class ConfigurationView:
 			return redirect('/wrtapp/login')
 
 		configs = Configuration.objects.all()
-		return render(request, 'config/index.html', {'configs': configs})
+		return render(request, 'config/index.html', {'configs': configs, 'is_administrator': request.user.is_superuser})
 
 	def edit(self, request, id):
 		if not request.user.is_authenticated:
 			return redirect('/wrtapp/login')
 
 		config = Configuration.objects.get(device_id=id)
-		return render(request, 'config/edit.html', {'config': config})
+		return render(request, 'config/edit.html', {'config': config, 'is_administrator': request.user.is_superuser})
 
 	def update(self, request, id):
 		if not request.user.is_authenticated:
@@ -162,7 +162,7 @@ class ConfigurationView:
 				LOGGER.error('Failed to save config form')
 		else:
 			LOGGER.error('Invalid config form: {}'.format(str(form.errors)))
-		return render(request, 'config/edit.html', {'config': config})
+		return render(request, 'config/edit.html', {'config': config, 'is_administrator': request.user.is_superuser})
 
 def check_status(stat):
 	now = datetime.datetime.now(stat.date.tzinfo)
@@ -178,7 +178,7 @@ class StatisticsView:
 		stats = Statistics.objects.all()
 		for stat in stats:
 			check_status(stat)
-		return render(request, 'stats/index.html', {'stats': stats})
+		return render(request, 'stats/index.html', {'stats': stats, 'is_administrator': request.user.is_superuser})
 
 	def delete(self, request, id):
 		if not request.user.is_authenticated:
@@ -235,14 +235,14 @@ class UserView:
 		else:
 			form = UserCreateForm()
 		# Show form again if NOT OK
-		return render(request, 'user/create.html', {'form': form})
+		return render(request, 'user/create.html', {'form': form, 'is_administrator': request.user.is_superuser})
 
 	def show(self, request):
 		if not request.user.is_authenticated:
 			return redirect('/wrtapp/login')
 
 		users = User.objects.all()
-		return render(request, 'user/index.html', {'users': users})
+		return render(request, 'user/index.html', {'users': users, 'is_administrator': request.user.is_superuser})
 
 	def edit(self, request, id):
 		if not request.user.is_authenticated:
@@ -261,7 +261,7 @@ class UserView:
 		form = UserUpdateForm()
 		form.update(userData)
 
-		return render(request, 'user/edit.html', {'form': form, 'userId': user.id})
+		return render(request, 'user/edit.html', {'form': form, 'userId': user.id, 'is_administrator': request.user.is_superuser})
 
 	def update(self, request, id):
 		if not request.user.is_authenticated:
@@ -293,7 +293,7 @@ class UserView:
 				LOGGER.error('Invalid user form: {}'.format(str(form.errors)))
 		else:
 			form = UserUpdateForm()
-		return render(request, 'user/edit.html', {'form': form})
+		return render(request, 'user/edit.html', {'form': form, 'is_administrator': request.user.is_superuser})
 
 	def delete(self, request, id):
 		if not request.user.is_authenticated:
@@ -318,7 +318,7 @@ class LogView:
 			return redirect('/wrtapp/login')
 
 		logs = Log.objects.all()
-		return render(request, 'log/index.html', {'logs': logs})
+		return render(request, 'log/index.html', {'logs': logs, 'is_administrator': request.user.is_superuser})
 
 	def delete(self, request, id):
 		if not request.user.is_authenticated:
@@ -352,14 +352,14 @@ class AboutView:
 		if not request.user.is_authenticated:
 			return redirect('/wrtapp/login')
 
-		return render(request, 'about/index.html', {})
+		return render(request, 'about/index.html', {'is_administrator': request.user.is_superuser})
 
 class ContactView:
 	def show(self, request):
 		if not request.user.is_authenticated:
 			return redirect('/wrtapp/login')
 
-		return render(request, 'contact/index.html', {})
+		return render(request, 'contact/index.html', {'is_administrator': request.user.is_superuser})
 
 loginView = LoginView()
 deviceView = DeviceView()
