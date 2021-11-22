@@ -44,24 +44,6 @@ class LoginView:
 		logout(request)
 		return redirect('/wrtapp/login')
 
-		# if request.method == 'POST':
-		# 	form = AuthenticationForm(request, data=request.POST)
-		# 	if form.is_valid():
-		# 		username = form.cleaned_data.get('username')
-		# 		password = form.cleaned_data.get('password')
-		# 		user = authenticate(username=username, password=password)
-		# 		if user:
-		# 			login(request, user)
-		# 			LOGGER.user_warning('Logged in', user)
-		# 			return redirect('/wrtapp/statistics/show')
-		# 		else:
-		# 			LOGGER.error('Invalid username or password attempt')
-		# 	else:
-		# 		LOGGER.error('Invalid login form received')
-
-		# form = AuthenticationForm()
-		# return render(request=request, template_name='login.html', context={'login_form':form})
-
 class DeviceView:
 	def create(self, request):
 		if request.method == 'POST':
