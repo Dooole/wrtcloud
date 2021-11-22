@@ -2,6 +2,7 @@ import datetime
 
 from django.shortcuts import render
 from django.shortcuts import redirect
+
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import AuthenticationForm
@@ -14,6 +15,8 @@ from wrtapp.models import Device
 from wrtapp.models import Configuration
 from wrtapp.models import Statistics
 from wrtapp.models import Log
+
+from django.http import HttpResponseForbidden
 
 from wrtapp.logger import Logger
 
@@ -51,6 +54,13 @@ class DeviceView:
 	def create(self, request):
 		if not request.user.is_authenticated:
 			return redirect('/wrtapp/login')
+
+		# We have only 2 types of users, so it's enough to
+		# check superuser flag here. However, we should use
+		# django authorization/permissions API for this:
+		# https://docs.djangoproject.com/en/3.2/topics/auth/default/#permissions-and-authorization
+		if not request.user.is_superuser:
+			return HttpResponseForbidden()
 
 		if request.method == 'POST':
 			form = DeviceForm(request.POST)
@@ -100,6 +110,9 @@ class DeviceView:
 		if not request.user.is_authenticated:
 			return redirect('/wrtapp/login')
 
+		if not request.user.is_superuser:
+			return HttpResponseForbidden()
+
 		device = Device.objects.get(id=id)
 		try:
 			device.delete()
@@ -110,6 +123,9 @@ class DeviceView:
 	def deleteall(self, request):
 		if not request.user.is_authenticated:
 			return redirect('/wrtapp/login')
+
+		if not request.user.is_superuser:
+			return HttpResponseForbidden()
 
 		try:
 			Device.objects.all().delete()
@@ -168,6 +184,9 @@ class StatisticsView:
 		if not request.user.is_authenticated:
 			return redirect('/wrtapp/login')
 
+		if not request.user.is_superuser:
+			return HttpResponseForbidden()
+
 		stat = Statistics.objects.get(device_id=id)
 		try:
 			stat.delete()
@@ -179,6 +198,9 @@ class StatisticsView:
 		if not request.user.is_authenticated:
 			return redirect('/wrtapp/login')
 
+		if not request.user.is_superuser:
+			return HttpResponseForbidden()
+
 		try:
 			Statistics.objects.all().delete()
 		except:
@@ -189,6 +211,9 @@ class UserView:
 	def create(self, request):
 		if not request.user.is_authenticated:
 			return redirect('/wrtapp/login')
+
+		if not request.user.is_superuser:
+			return HttpResponseForbidden()
 
 		if request.method == 'POST':
 			form = UserCreateForm(request.POST)
@@ -223,6 +248,9 @@ class UserView:
 		if not request.user.is_authenticated:
 			return redirect('/wrtapp/login')
 
+		if not request.user.is_superuser:
+			return HttpResponseForbidden()
+
 		user = User.objects.get(id=id)
 		# Protect password hash leak - wrap data
 		userData = {
@@ -238,6 +266,9 @@ class UserView:
 	def update(self, request, id):
 		if not request.user.is_authenticated:
 			return redirect('/wrtapp/login')
+
+		if not request.user.is_superuser:
+			return HttpResponseForbidden()
 
 		if request.method == 'POST':
 			user = User.objects.get(id=id)
@@ -268,6 +299,9 @@ class UserView:
 		if not request.user.is_authenticated:
 			return redirect('/wrtapp/login')
 
+		if not request.user.is_superuser:
+			return HttpResponseForbidden()
+
 		user = User.objects.get(id=id)
 		if user.username == 'admin':
 			LOGGER.error('Cannot delete built-in admin user')
@@ -290,6 +324,9 @@ class LogView:
 		if not request.user.is_authenticated:
 			return redirect('/wrtapp/login')
 
+		if not request.user.is_superuser:
+			return HttpResponseForbidden()
+
 		log = Log.objects.get(id=id)
 		try:
 			log.delete()
@@ -300,6 +337,9 @@ class LogView:
 	def deleteall(self, request):
 		if not request.user.is_authenticated:
 			return redirect('/wrtapp/login')
+
+		if not request.user.is_superuser:
+			return HttpResponseForbidden()
 
 		try:
 			Log.objects.all().delete()
