@@ -17,7 +17,9 @@ from django.contrib import admin
 from django.urls import include, path, re_path
 from wrtapp import views
 
+#every request received by the django framework is tested against series of patterns bellow
+#if patern matches, specified handler is called
 urlpatterns = [
-	path('wrtapp/', include('wrtapp.urls')),
-	re_path(r'^.*$', views.statsView.show),
+	path('wrtapp/', include('wrtapp.urls')), #continue url pattern matching in included urls file
+	re_path(r'^.*$', views.statsView.show), #pattern to match everything (catch all) , calls stats show handler(renders dashboard if user is loged in )
 ]

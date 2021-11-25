@@ -3,7 +3,7 @@ from django.urls import path
 from wrtapp import views
 from wrtapp import provision
 
-urlpatterns = [
+urlpatterns = [ #url patterns specific to wrtapp django application
 	# Login and logout
 	path('login', views.loginView.login),
 	path('logout', views.loginView.logout),

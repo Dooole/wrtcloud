@@ -1,5 +1,10 @@
-from django.db import models
+from django.db import models #this django module implements sql queries required to manage db . Django apps should use this db api instead of manual sql queries
 from django.contrib.auth.models import User
+
+#every class bellow represents data model directly migrated to postgresql db
+#and objects of these classes represent an entry in corresponding db table 
+#and attribute of the obj represents a field in db 
+#
 
 class Device(models.Model):
 	mac = models.CharField(max_length=32)

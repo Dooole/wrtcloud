@@ -15,6 +15,7 @@ from wrtapp.logger import Logger
 
 from django.conf import settings
 
+#reference dict which defines correct provisioning request structure and value formats
 PROV_SCHEMA = {
 	'statistics': {
 		'system': {
@@ -40,19 +41,20 @@ PROV_SCHEMA = {
 	'token': r'^[a-fA-F0-9]{64}$'
 }
 
+#obj to log errors/warnings/debugs to db log table and system console (foreground mode)
 LOGGER = Logger(__name__)
 
-def data_is_valid(schema, data):
+def data_is_valid(schema, data): #checks agent data against schema
 	for key in schema:
 		if key in data:
 			if isinstance(schema[key], dict):
 				if not isinstance(data[key], dict):
 					LOGGER.error('No dict required by schema: {}'.format(key))
 					return False
-				elif not data_is_valid(schema[key], data[key]):
+				elif not data_is_valid(schema[key], data[key]): #calls itself recursively for internal nested dicts
 					return False
 			else:
-				if not re.search(schema[key], str(data[key])):
+				if not re.search(schema[key], str(data[key])): #checks if value matches regular excpresion from the schema
 					LOGGER.error('Invalid value by schema: {}'.format(str(data[key])))
 					return False
 		else:
@@ -70,11 +72,11 @@ def token_is_valid(token):
 
 	return True
 
-def register_device(data):
+def register_device(data): #if devices does not exsist in db it makes initial table entry for device and config tables
 	reqst = data['statistics']['system']
 	mac = reqst['mac'].upper()
 	try:
-		device = Device.objects.get(mac=mac)
+		device = Device.objects.get(mac=mac) #obj which directly represents db device table
 	except Device.DoesNotExist:
 		device = None
 	except:
@@ -84,14 +86,14 @@ def register_device(data):
 		LOGGER.dev_debug('Device already exists', device)
 		return True
 
-	device = Device(
+	device = Device( #creates initial device table entry in a form of Device class new object
 		mac = mac,
 		model = reqst['model'],
 		name = 'Generic device',
 		description = 'Automatically added'
 	)
 	try:
-		device.save()
+		device.save() #saves device obj to db
 		LOGGER.dev_warning('Added new device', device)
 	except:
 		LOGGER.dev_error('Failed to save device', device)
@@ -99,7 +101,7 @@ def register_device(data):
 
 	LOGGER.dev_debug('Initializing config', device)
 	cfg = data['configuration']
-	config = Configuration(
+	config = Configuration(#creates initial config table entry in a form of Configuration class new object
 		device = device,
 		hostname = cfg['system']['hostname'],
 		ip = cfg['network']['ip'],
@@ -126,21 +128,21 @@ def update_stats(data):
 		return False
 
 	try:
-		stat = Statistics.objects.get(device_id=device.id)
+		stat = Statistics.objects.get(device_id=device.id) # searches for device statistics entry in db using onetoone device and stats relation
 	except Statistics.DoesNotExist:
 		stat = None
 	except:
 		LOGGER.dev_error('Failed to get stats', device)
 		return False
 
-	if stat:
+	if stat: #update exsisting stats
 		LOGGER.dev_debug('Updating stats', device)
 		stat.status = reqst['status']
 		stat.cpu_load = reqst['cpu_load']
 		stat.memory_usage = reqst['memory_usage']
-	else:
+	else: #cretae new stats
 		LOGGER.dev_debug('Creating stats', device)
-		stat = Statistics(
+		stat = Statistics( #represents stats db table
 			device = device,
 			status = reqst['status'],
 			cpu_load = reqst['cpu_load'],
@@ -155,10 +157,10 @@ def update_stats(data):
 
 	return True
 
-def build_config(data):
+def build_config(data): #if db config is different from the config send by agent this function forms py dict from db config 
 	reqst = data['statistics']['system']
-	reqcfg_sys = data['configuration']['system']
-	reqcfg_net = data['configuration']['network']
+	reqcfg_sys = data['configuration']['system']# variable pointing to system config dict directly
+	reqcfg_net = data['configuration']['network']# variable pointing to network config dict directly
 
 	mac = reqst['mac'].upper()
 	try:
@@ -168,16 +170,18 @@ def build_config(data):
 		return None
 
 	try:
-		dbcfg = Configuration.objects.get(device_id=device.id)
+		dbcfg = Configuration.objects.get(device_id=device.id) ## searches for device config entry in db using onetoone device and config relation
 	except:
 		LOGGER.dev_error('Failed to get config', device)
 		return None
 
 	changed = False
-	cfgdata = {'config_status': 'UNCHANGED'}
+	cfgdata = {'config_status': 'UNCHANGED'} #initial dict used to respond to agent request
 	cfg = {}
 
+	#all following six if statements checks if specific config parameter in db has changed and adds it to response dict if it has changed
 	if reqcfg_sys['hostname'] != dbcfg.hostname:
+		#this item exsistence check in extra 'cfg' dict is required to ensure that final dict contains only changed values
 		if not 'system' in cfg:
 			cfg['system'] = {}
 		cfg['system']['hostname'] = dbcfg.hostname
@@ -213,51 +217,52 @@ def build_config(data):
 		cfg['network']['dns2'] = dbcfg.dns2
 		changed = True
 
-	if changed:
+	if changed: #if any of the six config key above changed add 'configuration' obj to the final response dict 
+	#also set config status to change
 		LOGGER.dev_debug('Config changed', device)
 		cfgdata['config_status'] = 'CHANGED'
 		cfgdata['configuration'] = cfg
 
 	return cfgdata
 
-class ProvisionOperations:
+class ProvisionOperations: #single class which implements device authentification, registration and configuration
 	def process(self, request):
 		if request.method == 'POST':
 			try:
-				reqjson = json.loads(request.body)
+				reqjson = json.loads(request.body) #deserializes agent post data into py dict
 			except:
 				LOGGER.error('Failed to deserialize post')
 				return HttpResponseBadRequest()
 
-			if not data_is_valid(PROV_SCHEMA, reqjson):
+			if not data_is_valid(PROV_SCHEMA, reqjson): #verifies if data has required(by reference schema) structure and values
 				LOGGER.error('Invalid post data')
 				return HttpResponseBadRequest()
 
-			if not token_is_valid(reqjson['token']):
+			if not token_is_valid(reqjson['token']): #verifies if agent token is valid(passw correct)
 				LOGGER.error('Invalid security token')
 				return HttpResponseForbidden()
 
 			if not register_device(reqjson):
-				LOGGER.error('Failed to register device')
+				LOGGER.error('Failed to register device') #if device is not in db this funtion adds initial device and config table entry
 				return HttpResponseServerError()
 
 			if not update_stats(reqjson):
-				LOGGER.error('Failed to update stats')
+				LOGGER.error('Failed to update stats')#updates device stats entry
 				return HttpResponseServerError()
 
-			config = build_config(reqjson)
+			config = build_config(reqjson) #checks if agent config has changed in db and builts config py dict if it has 
 			if config:
-				try:
+				try: # serializes changed configuration and sends to agent
 					respdata = json.dumps(config, sort_keys=True, indent=4)
 				except:
 					LOGGER.error('Failed to serialize config')
 					return HttpResponseServerError()
 				return HttpResponse(respdata, content_type='application/json')
-			else:
+			else: #failed to built config
 				LOGGER.error('Config was not found')
 				return HttpResponseNotFound()
 		else:
 			LOGGER.error('Received not a POST request')
 			return HttpResponseBadRequest()
 
-ops = ProvisionOperations()
+ops = ProvisionOperations() #this obj is used by  urls.py as a provisioning url handler

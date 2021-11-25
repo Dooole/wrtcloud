@@ -5,10 +5,10 @@ import hashlib
 import logging
 import time
 import random
-import ssl
 
-from http.client import HTTPSConnection
+from http.client import HTTPConnection
 
+#sames as agent but imitates requests by incrementing index 
 CTX = {
 	"timeout": 10, # Seconds.
 	"interval": 1, # Seconds.
@@ -60,7 +60,7 @@ def server_send(datadict):
 		return None
 
 	headers = {"Content-type": "application/json"}
-	conn = HTTPSConnection(CTX["server"], CTX["port"], context = ssl._create_unverified_context())
+	conn = HTTPConnection(CTX["server"], CTX["port"], CTX["timeout"])
 	try:
 		conn.request("POST", "/wrtapp/provisioning", reqdata, headers)
 	except:
