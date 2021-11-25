@@ -12,26 +12,18 @@ b {
 h3 {
     font-size: 1.75rem;
     }
-img {
-    vertical-align: middle;
-    border: 0;
-    display: block;
-    max-width: 100%;
-    margin: 0 0 15px;
-    border-radius: 75px;
-    }
 .container h1 {
     color: #0563bb;
     font-weight: bold;
     margin: 0 0 15px;
     }
-.col-md-6{
+/*.col-md-6{
     position: relative;
     min-height: 1px;
     padding-right: 15px;
     padding-left: 15px
    }
-/*.form-inline {
+.form-inline {
 	display: inline-block;
 }*/
 /*Navigacijos juosta*/
@@ -50,13 +42,9 @@ img {
 }
 .navbar img{
 	width: 180px;
-    height: 50px;
+    height: 45px;
 	position: left;
 }
-/*.navbar .navbar-brand b {
-	font-weight: bold;
-	color: #0563bb;
-}*/
 .navbar .navbar-nav a:hover, .navbar .navbar-nav a:focus {
 	color: #0563bb !important;
 }
@@ -70,87 +58,13 @@ img {
 .navbar .nav-item i {
 	font-size: 32px;
 }
-.navbar .dropdown-item i {
+/*.navbar .dropdown-item i {
 	font-size: 16px;
 	min-width: 22px;
-}
+}*/
 .navbar .nav-item.show > a {
 	background: none !important;
 }
-.navbar .dropdown-menu {
-	border-radius: 1px;
-	border-color: #e5e5e5;
-	box-shadow: 0 2px 8px rgba(0,0,0,.05);
-}
-.navbar .dropdown-menu a {
-	color: #777;
-	padding: 8px 20px;
-	line-height: normal;
-	font-size: 15px;
-}
-.dropdown-item:active {
-	background-color: #fafafa;
-}
-.dropdown-item:hover {
-	background-color: #fafafa;
-}
-/*Karuselė
-#myCarousel{
-    padding-top: 57px;  
-    }
-.carousel-inner img {
-    width: 100%;
-    }
-.carousel-item {
-    text-align: center;
-    }
-.carousel-caption h1 {
-	color: #0563bb;
-    font-weight: bold;
-    margin: 0 0 15px;
-    }*/
-/*Scrolspy elementai*/
-.list-group{
-    position: sticky;
-    top: 15px;
-    text-align: center;
-    }
-.list-group-item.active {
-	background-color: #0563bb;
-	border-color:#0563bb;
-    }
-/*Viduje ScrollSpy esantys timeline elementai*/
-ul.timeline {
-    list-style-type: none;
-    position: relative;
-    }
-ul.timeline:before {
-    content: ' '; 
-    background: #d4d9df;
-
-    position: absolute;
-    left: 29px;
-    width: 2px;
-    height: 100%;
-    z-index: 400;
-    }
-ul.timeline > li {
-    margin: 20px 0;
-    padding-left: 20px;
-    }
-ul.timeline > li:before {
-    content: ' ';
-    background: #fafafa;
-    display: inline-block;
-    position: absolute;
-    border-radius: 50%;
-    border: 3px solid;
-    border-color:#0563bb;
-    left: 20px;
-    width: 20px;
-    height: 20px;
-    z-index: 400;
-    }
 /*Kontaktai ir formos*/
 .contact-form h1 {
     color: #0563bb;
@@ -204,26 +118,9 @@ ul.timeline > li:before {
 #footer .container {
     padding: 18px;
     }
-#footer .container h3{
+/*#footer .container h3{
     font-family: "Caveat", cursive;
     margin: 0 0 15px 0;
-    }
-#footer .social-links{
-    margin: 0 0 15px 0;
-    }
-#footer .social-links a {
-    font-size: 18px;
-    display: inline-block;
-    background: #0563bb;
-    color: #fafafa;
-    line-height: 1;
-    padding: 8px 0;
-    margin-right: 10px;
-    border-radius: 50%;
-    text-align: center;
-    width: 36px;
-    height: 36px;
-    transition: 0.3s;
     }
 /*Back to top elementas apačioje*/
 .back-to-top {
@@ -251,52 +148,6 @@ ul.timeline > li:before {
     background: #024778;
     transition: background 0.2s ease-in-out;
     }
-/*Pagrindinė nuotrauka
-.img-responsive {
-    display: block;
-    max-width: 100%;
-    height: auto;
-    margin: 0 0 15px;
-    border-radius: 75px;
-    } */
-/*Progreso juostos*/
-.progress {
-    height: 25px;
-    }
-.progress-bar {
-    text-align: left;
-    transition-duration: 3s;
-    padding-left: 15px;
-    font-family: "Open Sans", sans-serif;
-    }
-/*Akordeonas*/
-.bs-example{
-    margin: 0 0 15px;
-    }
-.accordion .fa{
-    margin-right: 0.5rem;
-    }
-.btn-link {
-    color: #0563bb;
-    }
-.btn-link:hover {
-    color: #024778;
-    }
-/*Akordeono viduje esantys mygtukai*/
- .card-body .btn {
-    min-height: 38px;
-    border-radius: 2px;
-    }
-.card-body .btn-primary, .card-body .btn-primary:active {
-    color: #fff;
-    min-width: 150px;
-    font-size: 16px;
-    background: #0563bb !important;
-    border: none;
-    }
-.card-body .btn-primary:hover {
-    background: #024778 !important; 
-    }
 /* sign in forma*/
 .login {
   min-height: 100vh;
@@ -310,16 +161,29 @@ ul.timeline > li:before {
   font-size: 0.9rem;
   letter-spacing: 0.05rem;
   padding: 0.75rem 1rem;
-}
-
-/*body {
-  background: #007bff;
-  background: linear-gradient(to right, #0062E6, #33AEFF);
 }*/
 
 .card-img-left {
-  width: 50%;
-  /* Link to your background image using in the property below! */
-  background: scroll center url('images/signin.jpg');
-  background-size: cover;
+	display: block;
+	width: 50%;
+	height: auto;
+	background: scroll center url('../img/signin.jpg');
+	background-size: cover;
+}
+.contact-form img {
+    vertical-align: middle;
+    border: 0;
+    display: block;
+    max-width: 100%;
+    margin: 0 0 15px;
+    border-radius: 75px;
+    }
+.jumbotron {
+    background-image: url('../img/banner.jpg');
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+}
+.basetable {
+	overflow-x: auto;
 }

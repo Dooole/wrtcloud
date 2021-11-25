@@ -31,16 +31,16 @@
             <div id="navbarCollapse" class="collapse navbar-collapse justify-content-start">
                 <div class="navbar-nav">
                     <li><a href="/wrtapp/statistics/show" class="nav-item nav-link"><i class="fa fa-home"></i> Dashboard</a></li>
-                    <li><a href="/wrtapp/device/show" class="nav-item nav-link"><i class="fa fa-desktop"></i> Device</a></li>
+                    <li><a href="/wrtapp/device/show" class="nav-item nav-link"><i class="fa fa-desktop"></i> Devices</a></li>
                     <li><a href="/wrtapp/configuration/show" class="nav-item nav-link"><i class="fa fa-gear"></i> Configuration</a></li>
-                    <li><a href="/wrtapp/user/show" class="nav-item nav-link"><i class="fa fa-user"></i> User</a></li>      
+                    <li><a href="/wrtapp/user/show" class="nav-item nav-link"><i class="fa fa-user"></i> Users</a></li>      
                     <li><a href="/wrtapp/log/show" class="nav-item nav-link"><i class="fa fa-file"></i> Log</a></li>
                     <li><a href="/wrtapp/about/show" class="nav-item nav-link"><i class="fa fa-address-card"></i> About</a></li>
                     <li><a href="/wrtapp/contact/show" class="nav-item nav-link"><i class="fa fa-envelope"></i> Contact</a></li>
                 </div>
                 <!-- Log in and register -->
                 <ul class="navbar-nav ml-auto">
-                    <a href="/wrtapp/logout" target="_blank" class="nav-item nav-link" id="loginLink">Log out</a>
+                    <li><a href="/wrtapp/logout" target="_blank" class="nav-item nav-link" id="loginLink"> Logout, {{ current_user }}</a></li>
                 </ul>
             </div>
     </nav>

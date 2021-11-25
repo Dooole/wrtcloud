@@ -1,55 +1,47 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Create</title>
-    {% load static %}
-    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}"/>
-    <link rel="stylesheet" href="{% static 'css/style.css' %}"/>
-</head>
-<body>
+{% extends "baseJumbotron.html" %}
+{% block title %}Add new device{% endblock %}
+{% block content %}
 <form method="POST" class="post-form" action="/wrtapp/device/create">
-        {% csrf_token %}
-    <div class="container">
-<br>
-    <div class="form-group row">
-    <label class="col-sm-1 col-form-label"></label>
-    <div class="col-sm-4">
-    <h3>Enter Details</h3>
+  {% csrf_token %}
+  <div class="container">
+    <div class="contact-form">
+      <div class="form-group row">
+        <label class="col-sm-1 col-form-label"></label>
+        <div class="col-sm-5">
+        <h1>Add new device</h1>
+        </div>
+      </div>
+      <div class="form-group row">
+        <label class="col-sm-2 col-form-label">MAC</label>
+        <div class="col-sm-4">
+          {{ form.mac }}
+        </div>
+      </div>
+      <div class="form-group row">
+        <label class="col-sm-2 col-form-label">Model</label>
+        <div class="col-sm-4">
+          {{ form.name }}
+        </div>  
+      </div>  
+      <div class="form-group row">
+        <label class="col-sm-2 col-form-label">Name</label>
+        <div class="col-sm-4">
+          {{ form.model }}
+        </div>
+      </div>
+      <div class="form-group row">
+        <label class="col-sm-2 col-form-label">Description</label>
+        <div class="col-sm-4">
+          {{ form.description }}
+        </div>
+      </div>
+      <div class="form-group row">
+        <label class="col-sm-1 col-form-label"></label>
+        <div class="col-sm-5">
+        <button type="submit" class="btn btn-primary"><i class="fa fa-check"></i> Submit</button>
+        </div>
+      </div>
     </div>
   </div>
-    <div class="form-group row">
-    <label class="col-sm-2 col-form-label">MAC</label>
-    <div class="col-sm-4">
-      {{ form.mac }}
-    </div>
-  </div>
-  <div class="form-group row">
-    <label class="col-sm-2 col-form-label">Model</label>
-    <div class="col-sm-4">
-      {{ form.name }}
-    </div>  
-  </div>  
-    <div class="form-group row">
-    <label class="col-sm-2 col-form-label">Name</label>
-    <div class="col-sm-4">
-      {{ form.model }}
-    </div>
-  </div>
-    <div class="form-group row">
-    <label class="col-sm-2 col-form-label">Description</label>
-    <div class="col-sm-4">
-      {{ form.description }}
-    </div>
-  </div>
-    <div class="form-group row">
-    <label class="col-sm-1 col-form-label"></label>
-    <div class="col-sm-4">
-    <button type="submit" class="btn btn-primary">Submit</button>
-    </div>
-  </div>
-    </div>
 </form>
-</body>
-</html>
+{% endblock %}

@@ -4,44 +4,44 @@
 <form method="POST" class="post-form" action="/wrtapp/user/create">
         {% csrf_token %}
     <div class="container">
-<br>
-    <div class="form-group row">
-    <label class="col-sm-1 col-form-label"></label>
-    <div class="col-sm-4">
-    <h1>Add user</h1>
-    </div>
-  </div>
-    <div class="form-group row">
-    <label class="col-sm-2 col-form-label">Username</label>
-    <div class="col-sm-4">
-      {{ form.username }}
-    </div>
-    </div>
-    <div class="form-group row">
-    <label class="col-sm-2 col-form-label">Email</label>
-    <div class="col-sm-4">
-      {{ form.email }}
-    </div>
-  </div>
-    <div class="form-group row">
-    <label class="col-sm-2 col-form-label">Password</label>
-    <div class="col-sm-4">
-      {{ form.password }}
-    </div>
-    </div>
-    </div>
-    <div class="form-group row">
-    <label class="col-sm-2 col-form-label">Administrator</label>
-    <div class="col-sm-4">
-      {{ form.is_superuser }}
-    </div>
-  </div>
-    <div class="form-group row">
-    <label class="col-sm-1 col-form-label"></label>
-    <div class="col-sm-4">
-    <button type="submit" class="btn btn-primary"><i class="fa fa-check"></i> Submit</button>
-    </div>
-  </div>
+        <div class="contact-form">
+            <div class="form-group row">
+                <label class="col-sm-1 col-form-label"></label>
+                <div class="col-sm-5">
+                <h1>Add user</h1>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="col-sm-2 col-form-label">Username</label>
+                <div class="col-sm-4">
+                  {{ form.username }}
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="col-sm-2 col-form-label">Email</label>
+                <div class="col-sm-4">
+                  {{ form.email }}
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="col-sm-2 col-form-label">Password</label>
+                <div class="col-sm-4">
+                  {{ form.password }}
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="col-sm-2 col-form-label">Administrator</label>
+                <div class="col-sm-4">
+                  {{ form.is_superuser }}
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="col-sm-1 col-form-label"></label>
+                <div class="col-sm-5">
+                <button type="submit" class="btn btn-primary"><i class="fa fa-check"></i> Submit</button>
+                </div>
+            </div>
+        </div>
     </div>
 </form>
 {% endblock %}

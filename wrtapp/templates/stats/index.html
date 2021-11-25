@@ -1,31 +1,58 @@
 {% extends "baseJumbotron.html" %}
 {% block title %}Dashboard{% endblock %}
-{% block content %}  
+{% block content %} 
+<h1>Statistics</h1> 
 <table class="table table-striped table-bordered table-sm">
     <thead class="thead-dark">
-    <tr>
-        <th>MAC</th>
-        <th>Status</th>
-        <th>CPU load</th>
-        <th>Memory usage</th>
-        <th></th>
-    </tr>
+        <tr>
+            <th>MAC</th>
+            <th>Status</th>
+            <th>CPU load</th>
+            <th>Memory usage</th>
+            <th></th>
+        </tr>
     </thead>
     <tbody>
-{% for stat in stats %}
-    <tr>
-        <td>{{ stat.device.mac }}</td>
-        <td>{{ stat.status }}</td>
-        <td>{{ stat.cpu_load }}</td>
-        <td>{{ stat.memory_usage }}</td>
-        <td>
-           {% if is_administrator %}
-             <a href="/wrtapp/statistics/delete/{{ stat.device.id }}">Delete</a>
-           {% else %}
-           {% endif %}
-        </td>
-    </tr>
-{% endfor %}
+        {% for stat in stats %}
+        <tr>
+            <td>{{ stat.device.mac }}</td>
+            <td>{{ stat.status }}</td>
+            <td>{{ stat.cpu_load }}</td>
+            <td>{{ stat.memory_usage }}</td>
+            <td>
+            {% if is_administrator %}
+            <a href="/wrtapp/statistics/delete/{{ stat.device.id }}">Delete</a>
+            {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
     </tbody>
 </table>
+
+{% if is_administrator %} 
+<div class="contact-form">
+    <!-- Button trigger modal -->
+    <button class="btn btn-primary" data-toggle="modal" data-target="#exampleModalCenter"><i class="fa fa-trash"></i> Delete all</button>
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLongTitle">Warning!</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            Are you sure?
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary"><i class="fa fa-trash"></i> Yes, delete all <a href="/wrtapp/statistics/deleteall"></a></button>
+          </div>
+        </div>
+      </div>
+    </div>
+</div>
+{% endif %}
 {% endblock %}
