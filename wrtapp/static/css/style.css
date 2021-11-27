@@ -187,3 +187,18 @@ h3 {
 .basetable {
 	overflow-x: auto;
 }
+
+.device-status-ok {
+    color: green;
+    font-weight: bold;
+}
+
+.device-status-offline {
+    color: red;
+    font-weight: bold;
+}
+
+.device-status-other {
+    color: blue;
+    font-weight: bold;
+}

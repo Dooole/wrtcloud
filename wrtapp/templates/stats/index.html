@@ -19,11 +19,11 @@
         <tr>
             <td>{{ stat.device.mac }}</td>
             {% if stat.status == 'OK' %}
-                <td style="color: green; font-weight: bold">{{ stat.status }}</td>
+                <td class="device-status-ok">{{ stat.status }}</td>
             {% elif stat.status == 'OFFLINE' %}
-                <td style="color: red; font-weight: bold">{{ stat.status }}</td>
+                <td class="device-status-offline">{{ stat.status }}</td>
             {% else %}
-                <td style="color: blue; font-weight: bold">{{ stat.status }}</td>
+                <td class="device-status-other">{{ stat.status }}</td>
             {% endif %}
 
             <td>{{ stat.cpu_load }}</td>
