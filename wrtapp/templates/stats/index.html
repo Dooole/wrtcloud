@@ -9,7 +9,9 @@
             <th>Status</th>
             <th>CPU load</th>
             <th>Memory usage</th>
-            <th></th>
+            {% if is_administrator %}
+                <th></th>
+            {% endif %}
         </tr>
     </thead>
     <tbody>
@@ -26,11 +28,11 @@
 
             <td>{{ stat.cpu_load }}</td>
             <td>{{ stat.memory_usage }}</td>
-            <td>
             {% if is_administrator %}
+            <td>
             <a href="/wrtapp/statistics/delete/{{ stat.device.id }}">Delete</a>
-            {% endif %}
             </td>
+            {% endif %}
         </tr>
         {% endfor %}
     </tbody>

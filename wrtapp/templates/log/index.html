@@ -10,7 +10,9 @@
             <th>Severity</th>
             <th>Message</th>
             <th>Date</th>
-            <th></th>
+            {% if is_administrator %}
+                <th></th>
+            {% endif %}
         </tr>
     </thead>
     <tbody>
@@ -21,11 +23,11 @@
                 <td>{{ log.severity }}</td>
                 <td>{{ log.message }}</td>
                 <td>{{ log.date }}</td>
-                <td>
                 {% if is_administrator %}
+                <td>
                 <a href="/wrtapp/log/delete/{{ log.id }}">Delete</a>
-                {% endif %}
                 </td>
+                {% endif %}
             </tr>
         {% endfor %}
     </tbody>

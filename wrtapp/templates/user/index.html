@@ -9,7 +9,9 @@
             <th>Username</th>
             <th>Email</th>
             <th>Last login</th>
-            <th></th>
+            {% if is_administrator %}
+                <th></th>
+            {% endif %}
         </tr>
     </thead>
     <tbody>
@@ -25,12 +27,12 @@
                 <td>{{ user.username }}</td>
                 <td>{{ user.email }}</td>
                 <td>{{ user.last_login }}</td>
-                <td>
                 {% if is_administrator %}
+                <td>
                     <a href="/wrtapp/user/edit/{{ user.id }}">Edit</a>
                     <a href="/wrtapp/user/delete/{{ user.id }}">Delete</a>
-                {% endif %}
                 </td>
+                {% endif %}
             </tr>
         {% endfor %}
     </tbody>
