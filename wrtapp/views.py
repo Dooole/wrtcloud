@@ -18,13 +18,22 @@ from wrtapp.models import Log
 
 from django.http import HttpResponseForbidden
 
+# Built-in DB module, which uses DB connector to manage DB and provides an API to it.
+from django.db import connection
+from django.db import reset_queries
+
 from wrtapp.logger import Logger
 
 LOGGER = Logger(__name__)
 OFFLINE_THRESHOLD = 60 # Seconds. # if device does not respond in 60 s marked as offline
 
-#all classes bellow represent specific wrtapp backend module and implements handlers for every url pattern defined in urls.py
+# Dump SQL queries to console
+def log_sql_query():
+	for query in connection.queries:
+		LOGGER.debug("SQL: {}".format(query['sql']))
+		reset_queries()
 
+#all classes bellow represent specific wrtapp backend module and implements handlers for every url pattern defined in urls.py
 
 #this class is a bit special because it uses django authentification middleware for login and logout implementation
 #we only pass arguments to this api and api ensures password verification , session creation and etc
@@ -39,6 +48,7 @@ class LoginView:
 				if user:
 					login(request, user)
 					LOGGER.user_warning('Logged in', user)
+					log_sql_query()
 					return redirect('/wrtapp/statistics/show')
 				else:
 					LOGGER.error('Invalid username or password attempt')
@@ -46,6 +56,7 @@ class LoginView:
 				LOGGER.error('Invalid login form received')
 
 		form = AuthenticationForm()
+		log_sql_query()
 		return render(request, 'login.html', {'form': form}) #render is the main method which binds html template with data model. 
 		#the last argument to this function is py dict which can be accessed in the template using django template scripting language 
 
@@ -74,6 +85,7 @@ class DeviceView:
 			if form.is_valid():
 				try:
 					form.save() #save method saves form data to the db via model class
+					log_sql_query()
 					return redirect('/wrtapp/device/show')
 				except:
 					LOGGER.error('Failed to save device form')
@@ -81,6 +93,7 @@ class DeviceView:
 				LOGGER.error('Invalid device form: {}'.format(str(form.errors)))
 		else:
 			form = DeviceForm()
+		log_sql_query()
 		return render(request, 'device/create.html', {'form': form, 'is_administrator': request.user.is_superuser, 'current_user': request.user.username})
 
 	def show(self, request):
@@ -88,6 +101,7 @@ class DeviceView:
 			return redirect('/wrtapp/login')
 
 		devices = Device.objects.all()
+		log_sql_query()
 		return render(request, 'device/index.html', {'devices': devices, 'is_administrator': request.user.is_superuser, 'current_user': request.user.username})
 
 	def edit(self, request, id):
@@ -95,6 +109,7 @@ class DeviceView:
 			return redirect('/wrtapp/login')
 
 		device = Device.objects.get(id=id)
+		log_sql_query()
 		return render(request, 'device/edit.html', {'device': device, 'is_administrator': request.user.is_superuser, 'current_user': request.user.username})
 
 	def update(self, request, id):
@@ -106,11 +121,13 @@ class DeviceView:
 		if form.is_valid():
 			try:
 				form.save()
+				log_sql_query()
 				return redirect('/wrtapp/device/show')
 			except:
 				LOGGER.error('Failed to save device form')
 		else:
 			LOGGER.error('Invalid device form: {}'.format(str(form.errors)))
+		log_sql_query()
 		return render(request, 'device/edit.html', {'device': device, 'is_administrator': request.user.is_superuser, 'current_user': request.user.username})
 
 	def delete(self, request, id):
@@ -123,6 +140,7 @@ class DeviceView:
 		device = Device.objects.get(id=id)
 		try:
 			device.delete()
+			log_sql_query()
 			return redirect('/wrtapp/device/show')
 		except:
 			LOGGER.error('Failed to delete device')
@@ -138,6 +156,7 @@ class DeviceView:
 			Device.objects.all().delete()
 		except:
 			LOGGER.error('Failed to delete all devices')
+		log_sql_query()
 		return redirect('/wrtapp/device/show')
 
 class ConfigurationView:
@@ -146,6 +165,7 @@ class ConfigurationView:
 			return redirect('/wrtapp/login')
 
 		configs = Configuration.objects.all()
+		log_sql_query()
 		return render(request, 'config/index.html', {'configs': configs, 'is_administrator': request.user.is_superuser, 'current_user': request.user.username})
 
 	def edit(self, request, id):
@@ -153,6 +173,7 @@ class ConfigurationView:
 			return redirect('/wrtapp/login')
 
 		config = Configuration.objects.get(device_id=id)
+		log_sql_query()
 		return render(request, 'config/edit.html', {'config': config, 'is_administrator': request.user.is_superuser, 'current_user': request.user.username})
 
 	def update(self, request, id):
@@ -164,11 +185,13 @@ class ConfigurationView:
 		if form.is_valid():
 			try:
 				form.save()
+				log_sql_query()
 				return redirect('/wrtapp/configuration/show')
 			except:
 				LOGGER.error('Failed to save config form')
 		else:
 			LOGGER.error('Invalid config form: {}'.format(str(form.errors)))
+		log_sql_query()
 		return render(request, 'config/edit.html', {'config': config, 'is_administrator': request.user.is_superuser, 'current_user': request.user.username})
 
 def check_status(stat):
@@ -185,6 +208,7 @@ class StatisticsView:
 		stats = Statistics.objects.all()
 		for stat in stats:
 			check_status(stat)
+		log_sql_query()
 		return render(request, 'stats/index.html', {'stats': stats, 'is_administrator': request.user.is_superuser, 'current_user': request.user.username})
 
 	def delete(self, request, id):
@@ -197,6 +221,7 @@ class StatisticsView:
 		stat = Statistics.objects.get(device_id=id)
 		try:
 			stat.delete()
+			log_sql_query()
 			return redirect('/wrtapp/statistics/show')
 		except:
 			LOGGER.error('Failed to delete stats')
@@ -212,6 +237,7 @@ class StatisticsView:
 			Statistics.objects.all().delete()
 		except:
 			LOGGER.error('Failed to delete all statistics')
+		log_sql_query()
 		return redirect('/wrtapp/statistics/show')
 
 class UserView:
@@ -233,7 +259,7 @@ class UserView:
 					)
 					user.is_superuser = form.cleaned_data['is_superuser']
 					user.save()
-
+					log_sql_query()
 					return redirect('/wrtapp/user/show')
 				except:
 					LOGGER.error('Failed to save user form')
@@ -242,6 +268,7 @@ class UserView:
 		else:
 			form = UserCreateForm()
 		# Show form again if NOT OK
+		log_sql_query()
 		return render(request, 'user/create.html', {'form': form, 'is_administrator': request.user.is_superuser, 'current_user': request.user.username})
 
 	def show(self, request):
@@ -249,6 +276,7 @@ class UserView:
 			return redirect('/wrtapp/login')
 
 		users = User.objects.all()
+		log_sql_query()
 		return render(request, 'user/index.html', {'users': users, 'is_administrator': request.user.is_superuser, 'current_user': request.user.username})
 
 	def edit(self, request, id):
@@ -267,7 +295,7 @@ class UserView:
 		}
 		form = UserUpdateForm()
 		form.update(userData)
-
+		log_sql_query()
 		return render(request, 'user/edit.html', {'form': form, 'userId': user.id, 'is_administrator': request.user.is_superuser, 'current_user': request.user.username})
 
 	def update(self, request, id):
@@ -292,7 +320,7 @@ class UserView:
 							LOGGER.error('Invalid password format', user)
 						LOGGER.user_warning('Changed password', user)
 					user.save()
-
+					log_sql_query()
 					return redirect('/wrtapp/user/show')
 				except:
 					LOGGER.error('Failed to save user form')
@@ -300,6 +328,7 @@ class UserView:
 				LOGGER.error('Invalid user form: {}'.format(str(form.errors)))
 		else:
 			form = UserUpdateForm()
+		log_sql_query()
 		return render(request, 'user/edit.html', {'form': form, 'is_administrator': request.user.is_superuser, 'current_user': request.user.username})
 
 	def delete(self, request, id):
@@ -312,9 +341,11 @@ class UserView:
 		user = User.objects.get(id=id)
 		if user.username == 'admin':
 			LOGGER.error('Cannot delete built-in admin user')
+			log_sql_query()
 			return redirect('/wrtapp/user/show')
 		try:
 			user.delete()
+			log_sql_query()
 			return redirect('/wrtapp/user/show')
 		except:
 			LOGGER.error('Failed to delete user')
@@ -325,6 +356,7 @@ class LogView:
 			return redirect('/wrtapp/login')
 
 		logs = Log.objects.all()
+		log_sql_query()
 		return render(request, 'log/index.html', {'logs': logs, 'is_administrator': request.user.is_superuser, 'current_user': request.user.username})
 
 	def delete(self, request, id):
@@ -337,6 +369,7 @@ class LogView:
 		log = Log.objects.get(id=id)
 		try:
 			log.delete()
+			log_sql_query()
 			return redirect('/wrtapp/log/show')
 		except:
 			LOGGER.error('Failed to delete log')
@@ -352,7 +385,18 @@ class LogView:
 			Log.objects.all().delete()
 		except:
 			LOGGER.error('Failed to delete all logs')
+		log_sql_query()
 		return redirect('/wrtapp/log/show')
+
+class ToolsView:
+	def show(self, request):
+		if not request.user.is_authenticated:
+			return redirect('/wrtapp/login')
+
+		if not request.user.is_superuser:
+			return HttpResponseForbidden()
+
+		return render(request, 'tools/index.html', {'is_administrator': request.user.is_superuser, 'current_user': request.user.username})
 
 class AboutView:
 	def show(self, request):
@@ -375,5 +419,6 @@ configView = ConfigurationView()
 statsView = StatisticsView()
 userView = UserView()
 logView = LogView()
+toolsView = ToolsView()
 aboutView = AboutView()
 contactView = ContactView()
