@@ -16,7 +16,14 @@
         {% for stat in stats %}
         <tr>
             <td>{{ stat.device.mac }}</td>
-            <td>{{ stat.status }}</td>
+            {% if stat.status == 'OK' %}
+                <td style="color: green; font-weight: bold">{{ stat.status }}</td>
+            {% elif stat.status == 'OFFLINE' %}
+                <td style="color: red; font-weight: bold">{{ stat.status }}</td>
+            {% else %}
+                <td style="color: blue; font-weight: bold">{{ stat.status }}</td>
+            {% endif %}
+
             <td>{{ stat.cpu_load }}</td>
             <td>{{ stat.memory_usage }}</td>
             <td>
