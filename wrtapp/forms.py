@@ -37,3 +37,6 @@ class UserUpdateForm(forms.Form):
 		self.initial['username'] = userData['username']
 		self.initial['email'] = userData['email']
 		self.initial['is_administrator'] = userData['is_administrator']
+
+class SearchForm(forms.Form):
+	search = forms.CharField()

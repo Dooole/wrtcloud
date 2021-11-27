@@ -7,9 +7,13 @@ from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import AuthenticationForm
 
+from django.contrib.postgres.search import SearchVector
+
+from django import forms
+
 from wrtapp.forms import DeviceForm
 from wrtapp.forms import ConfigurationForm
-from wrtapp.forms import UserCreateForm, UserUpdateForm
+from wrtapp.forms import UserCreateForm, UserUpdateForm, SearchForm
 
 from wrtapp.models import Device
 from wrtapp.models import Configuration
@@ -104,6 +108,35 @@ class DeviceView:
 		log_sql_query()
 		return render(request, 'device/index.html', {'devices': devices, 'is_administrator': request.user.is_superuser, 'current_user': request.user.username})
 
+	# Search using built-in posgres search feature
+	def search(self, request):
+		if not request.user.is_authenticated:
+			return redirect('/wrtapp/login')
+
+		if request.method == 'POST':
+			form = SearchForm(request.POST)
+			if form.is_valid():
+				try:
+					searchstr = form.cleaned_data.get('search')
+					devices = Device.objects.annotate(
+						search=SearchVector('mac', 'model', 'name', 'description'),
+					).filter(search=searchstr)
+
+					log_sql_query()
+					return render(request, 'device/index.html', {'devices': devices, 'is_administrator': request.user.is_superuser, 'current_user': request.user.username})
+				except:
+					LOGGER.error('Failed to search')
+					log_sql_query()
+					return redirect('/wrtapp/device/show')
+			else:
+				LOGGER.error('Invalid search form: {}'.format(str(form.errors)))
+				log_sql_query()
+				return redirect('/wrtapp/device/show')
+		else:
+			LOGGER.error('Search attempt with not a POST')
+			log_sql_query()
+			return redirect('/wrtapp/device/show')
+
 	def edit(self, request, id):
 		if not request.user.is_authenticated:
 			return redirect('/wrtapp/login')
@@ -168,6 +201,34 @@ class ConfigurationView:
 		log_sql_query()
 		return render(request, 'config/index.html', {'configs': configs, 'is_administrator': request.user.is_superuser, 'current_user': request.user.username})
 
+	def search(self, request):
+		if not request.user.is_authenticated:
+			return redirect('/wrtapp/login')
+
+		if request.method == 'POST':
+			form = SearchForm(request.POST)
+			if form.is_valid():
+				try:
+					searchstr = form.cleaned_data.get('search')
+					configs = Configuration.objects.annotate(
+						search=SearchVector('device__mac', 'hostname', 'ip', 'netmask', 'gateway', 'dns1', 'dns2'),
+					).filter(search=searchstr)
+
+					log_sql_query()
+					return render(request, 'config/index.html', {'configs': configs, 'is_administrator': request.user.is_superuser, 'current_user': request.user.username})
+				except:
+					LOGGER.error('Failed to search')
+					log_sql_query()
+					return redirect('/wrtapp/configuration/show')
+			else:
+				LOGGER.error('Invalid search form: {}'.format(str(form.errors)))
+				log_sql_query()
+				return redirect('/wrtapp/configuration/show')
+		else:
+			LOGGER.error('Search attempt with not a POST')
+			log_sql_query()
+			return redirect('/wrtapp/configuration/show')
+
 	def edit(self, request, id):
 		if not request.user.is_authenticated:
 			return redirect('/wrtapp/login')
@@ -210,6 +271,35 @@ class StatisticsView:
 			check_status(stat)
 		log_sql_query()
 		return render(request, 'stats/index.html', {'stats': stats, 'is_administrator': request.user.is_superuser, 'current_user': request.user.username})
+
+	def search(self, request):
+		if not request.user.is_authenticated:
+			return redirect('/wrtapp/login')
+
+		if request.method == 'POST':
+			form = SearchForm(request.POST)
+			if form.is_valid():
+				try:
+					searchstr = form.cleaned_data.get('search')
+					stats = Statistics.objects.annotate(
+						search=SearchVector('device__mac', 'status', 'cpu_load', 'memory_usage'),
+					).filter(search=searchstr)
+					for stat in stats:
+						check_status(stat)
+					log_sql_query()
+					return render(request, 'stats/index.html', {'stats': stats, 'is_administrator': request.user.is_superuser, 'current_user': request.user.username})
+				except:
+					LOGGER.error('Failed to search')
+					log_sql_query()
+					return redirect('/wrtapp/statistics/show')
+			else:
+				LOGGER.error('Invalid search form: {}'.format(str(form.errors)))
+				log_sql_query()
+				return redirect('/wrtapp/statistics/show')
+		else:
+			LOGGER.error('Search attempt with not a POST')
+			log_sql_query()
+			return redirect('/wrtapp/statistics/show')
 
 	def delete(self, request, id):
 		if not request.user.is_authenticated:
@@ -278,6 +368,33 @@ class UserView:
 		users = User.objects.all()
 		log_sql_query()
 		return render(request, 'user/index.html', {'users': users, 'is_administrator': request.user.is_superuser, 'current_user': request.user.username})
+
+	def search(self, request):
+		if not request.user.is_authenticated:
+			return redirect('/wrtapp/login')
+
+		if request.method == 'POST':
+			form = SearchForm(request.POST)
+			if form.is_valid():
+				try:
+					searchstr = form.cleaned_data.get('search')
+					users = User.objects.annotate(
+						search=SearchVector('username', 'email'),
+					).filter(search=searchstr)
+					log_sql_query()
+					return render(request, 'user/index.html', {'users': users, 'is_administrator': request.user.is_superuser, 'current_user': request.user.username})
+				except:
+					LOGGER.error('Failed to search')
+					log_sql_query()
+					return redirect('/wrtapp/user/show')
+			else:
+				LOGGER.error('Invalid search form: {}'.format(str(form.errors)))
+				log_sql_query()
+				return redirect('/wrtapp/user/show')
+		else:
+			LOGGER.error('Search attempt with not a POST')
+			log_sql_query()
+			return redirect('/wrtapp/user/show')
 
 	def edit(self, request, id):
 		if not request.user.is_authenticated:
@@ -358,6 +475,33 @@ class LogView:
 		logs = Log.objects.all()
 		log_sql_query()
 		return render(request, 'log/index.html', {'logs': logs, 'is_administrator': request.user.is_superuser, 'current_user': request.user.username})
+
+	def search(self, request):
+		if not request.user.is_authenticated:
+			return redirect('/wrtapp/login')
+
+		if request.method == 'POST':
+			form = SearchForm(request.POST)
+			if form.is_valid():
+				try:
+					searchstr = form.cleaned_data.get('search')
+					logs = Log.objects.annotate(
+						search=SearchVector('device__mac', 'user__username', 'severity', 'message'),
+					).filter(search=searchstr)
+					log_sql_query()
+					return render(request, 'log/index.html', {'logs': logs, 'is_administrator': request.user.is_superuser, 'current_user': request.user.username})
+				except:
+					LOGGER.error('Failed to search')
+					log_sql_query()
+					return redirect('/wrtapp/log/show')
+			else:
+				LOGGER.error('Invalid search form: {}'.format(str(form.errors)))
+				log_sql_query()
+				return redirect('/wrtapp/log/show')
+		else:
+			LOGGER.error('Search attempt with not a POST')
+			log_sql_query()
+			return redirect('/wrtapp/log/show')
 
 	def delete(self, request, id):
 		if not request.user.is_authenticated:
