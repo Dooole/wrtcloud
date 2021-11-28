@@ -33,7 +33,7 @@
                                     {% csrf_token %}
                                     <div class="form-floating mb-3">
                                         <label for="floatingInputUsername">Username</label>
-                                        <input type="text" class="form-control" id="floatingInputUsername" placeholder="Username" name="username" autofocus autocapitalize="none" autocomplete="username" maxlength="150" required id="id_username">
+                                        <input type="text" class="form-control" id="floatingInputUsername" placeholder="Username" name="username" autofocus autocapitalize="none" autocomplete="username" maxlength="150" required id="id_username" required data-validation-required-message="Please, enter your username">
                                     </div>
                                     <div class="form-floating mb-3">
                                         <label for="floatingPassword">Password</label>

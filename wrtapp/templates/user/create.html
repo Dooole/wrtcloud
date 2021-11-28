@@ -11,28 +11,29 @@
                 <h1>Add user</h1>
                 </div>
             </div>
+                
             <div class="form-group row">
                 <label class="col-sm-2 col-form-label">Username</label>
                 <div class="col-sm-4">
-                  {{ form.username }}
+                    <input type="text" class="form-control" name="username" autofocus autocapitalize="none" maxlength="150" required id="id_username">
                 </div>
             </div>
             <div class="form-group row">
                 <label class="col-sm-2 col-form-label">Email</label>
                 <div class="col-sm-4">
-                  {{ form.email }}
+                    <input type="email" class="form-control" name="email" maxlength="254" id="id_email">
                 </div>
             </div>
             <div class="form-group row">
                 <label class="col-sm-2 col-form-label">Password</label>
                 <div class="col-sm-4">
-                  {{ form.password }}
+                    <input type="password" class="form-control" name="password" maxlength="128" required id="id_password">
                 </div>
             </div>
             <div class="form-group row">
                 <label class="col-sm-2 col-form-label">Administrator</label>
                 <div class="col-sm-4">
-                  {{ form.is_superuser }}
+                    <input type="checkbox" name="is_superuser" id="id_is_superuser">
                 </div>
             </div>
             <div class="form-group row">

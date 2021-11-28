@@ -22,10 +22,8 @@ h3 {
     min-height: 1px;
     padding-right: 15px;
     padding-left: 15px
-   }
-.form-inline {
-	display: inline-block;
-}*/
+   }*/
+
 /*Navigacijos juosta*/
 .navbar-header.col {
 	padding: 0 !important;
@@ -84,7 +82,6 @@ h3 {
 .contact-form .btn-primary, .contact-form .btn-primary:active, .btn-login:active{
     color: #fff;
     min-width: 150px;
-    font-size: 16px;
     background: #0563bb !important;
     border: none;
     }
@@ -177,13 +174,20 @@ h3 {
     max-width: 100%;
     margin: 0 0 15px;
     border-radius: 75px;
-    }
+}
+
 .jumbotron {
     background-image: url('../img/banner.jpg');
     background-size: cover;
     background-position: center center;
     background-repeat: no-repeat;
+    font-family: "Open Sans", sans-serif;
 }
+
+/*.jumbotron input, button {
+    float: right;
+}
+*/
 .basetable {
 	overflow-x: auto;
 }
@@ -201,4 +205,9 @@ h3 {
 .device-status-other {
     color: blue;
     font-weight: bold;
+}
+
+iframe {
+    margin: 0 0 15px; 
+    border: 0;
 }
