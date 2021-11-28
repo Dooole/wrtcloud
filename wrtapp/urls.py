@@ -45,4 +45,7 @@ urlpatterns = [ #url patterns specific to wrtapp django application
 	path('contact/show', views.contactView.show),
 	# Provision
 	path('provisioning', csrf_exempt(provision.ops.process)),
+	# Errors
+	path('errors/notfound', views.errorsView.notfound),
+	path('errors/forbidden', views.errorsView.forbidden),
 ]

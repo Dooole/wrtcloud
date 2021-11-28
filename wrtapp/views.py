@@ -82,7 +82,7 @@ class DeviceView:
 		# django authorization/permissions API for this:
 		# https://docs.djangoproject.com/en/3.2/topics/auth/default/#permissions-and-authorization
 		if not request.user.is_superuser:
-			return HttpResponseForbidden()
+			return redirect('/wrtapp/errors/forbidden')
 
 		if request.method == 'POST':
 			form = DeviceForm(request.POST)
@@ -168,7 +168,7 @@ class DeviceView:
 			return redirect('/wrtapp/login')
 
 		if not request.user.is_superuser:
-			return HttpResponseForbidden()
+			return redirect('/wrtapp/errors/forbidden')
 
 		device = Device.objects.get(id=id)
 		try:
@@ -183,7 +183,7 @@ class DeviceView:
 			return redirect('/wrtapp/login')
 
 		if not request.user.is_superuser:
-			return HttpResponseForbidden()
+			return redirect('/wrtapp/errors/forbidden')
 
 		try:
 			Device.objects.all().delete()
@@ -306,7 +306,7 @@ class StatisticsView:
 			return redirect('/wrtapp/login')
 
 		if not request.user.is_superuser:
-			return HttpResponseForbidden()
+			return redirect('/wrtapp/errors/forbidden')
 
 		stat = Statistics.objects.get(device_id=id)
 		try:
@@ -321,7 +321,7 @@ class StatisticsView:
 			return redirect('/wrtapp/login')
 
 		if not request.user.is_superuser:
-			return HttpResponseForbidden()
+			return redirect('/wrtapp/errors/forbidden')
 
 		try:
 			Statistics.objects.all().delete()
@@ -336,7 +336,7 @@ class UserView:
 			return redirect('/wrtapp/login')
 
 		if not request.user.is_superuser:
-			return HttpResponseForbidden()
+			return redirect('/wrtapp/errors/forbidden')
 
 		if request.method == 'POST':
 			form = UserCreateForm(request.POST)
@@ -401,7 +401,7 @@ class UserView:
 			return redirect('/wrtapp/login')
 
 		if not request.user.is_superuser:
-			return HttpResponseForbidden()
+			return redirect('/wrtapp/errors/forbidden')
 
 		user = User.objects.get(id=id)
 		# Protect password hash leak - wrap data
@@ -420,7 +420,7 @@ class UserView:
 			return redirect('/wrtapp/login')
 
 		if not request.user.is_superuser:
-			return HttpResponseForbidden()
+			return redirect('/wrtapp/errors/forbidden')
 
 		if request.method == 'POST':
 			user = User.objects.get(id=id)
@@ -453,7 +453,7 @@ class UserView:
 			return redirect('/wrtapp/login')
 
 		if not request.user.is_superuser:
-			return HttpResponseForbidden()
+			return redirect('/wrtapp/errors/forbidden')
 
 		user = User.objects.get(id=id)
 		if user.username == 'admin':
@@ -508,7 +508,7 @@ class LogView:
 			return redirect('/wrtapp/login')
 
 		if not request.user.is_superuser:
-			return HttpResponseForbidden()
+			return redirect('/wrtapp/errors/forbidden')
 
 		log = Log.objects.get(id=id)
 		try:
@@ -523,7 +523,7 @@ class LogView:
 			return redirect('/wrtapp/login')
 
 		if not request.user.is_superuser:
-			return HttpResponseForbidden()
+			return redirect('/wrtapp/errors/forbidden')
 
 		try:
 			Log.objects.all().delete()
@@ -538,7 +538,7 @@ class ToolsView:
 			return redirect('/wrtapp/login')
 
 		if not request.user.is_superuser:
-			return HttpResponseForbidden()
+			return redirect('/wrtapp/errors/forbidden')
 
 		return render(request, 'tools/index.html', {'is_administrator': request.user.is_superuser, 'current_user': request.user.username})
 
@@ -556,6 +556,19 @@ class ContactView:
 
 		return render(request, 'contact/index.html', {'is_administrator': request.user.is_superuser, 'current_user': request.user.username})
 
+class ErrorsView:
+	def notfound(self, request):
+		if not request.user.is_authenticated:
+			return redirect('/wrtapp/login')
+
+		return render(request, 'errors/notfound.html', {'current_user': request.user.username}, status=404)
+
+	def forbidden(self, request):
+		if not request.user.is_authenticated:
+			return redirect('/wrtapp/login')
+
+		return render(request, 'errors/forbidden.html', {'current_user': request.user.username}, status=403)
+
 #these obj are used to call request handler in urls.py
 loginView = LoginView()
 deviceView = DeviceView()
@@ -566,3 +579,4 @@ logView = LogView()
 toolsView = ToolsView()
 aboutView = AboutView()
 contactView = ContactView()
+errorsView = ErrorsView()
