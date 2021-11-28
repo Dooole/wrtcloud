@@ -260,6 +260,7 @@ def check_status(stat):
 	diff = now - stat.date
 	if diff.total_seconds() > OFFLINE_THRESHOLD:
 		stat.status = 'OFFLINE'
+		stat.save()
 
 class StatisticsView:
 	def show(self, request):
@@ -284,8 +285,6 @@ class StatisticsView:
 					stats = Statistics.objects.annotate(
 						search=SearchVector('device__mac', 'status', 'cpu_load', 'memory_usage'),
 					).filter(search=searchstr)
-					for stat in stats:
-						check_status(stat)
 					log_sql_query()
 					return render(request, 'stats/index.html', {'stats': stats, 'is_administrator': request.user.is_superuser, 'current_user': request.user.username})
 				except:
