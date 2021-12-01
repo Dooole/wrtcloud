@@ -43,6 +43,7 @@ def log_sql_query():
 #we only pass arguments to this api and api ensures password verification , session creation and etc
 class LoginView:
 	def login(self, request):
+		failed = False
 		if request.method == 'POST':
 			form = AuthenticationForm(request, data=request.POST)
 			if form.is_valid(): #form obj represents data from html imput fields sent by the browser
@@ -55,13 +56,15 @@ class LoginView:
 					log_sql_query()
 					return redirect('/wrtapp/statistics/show')
 				else:
+					failed = True
 					LOGGER.error('Invalid username or password attempt')
 			else:
 				LOGGER.error('Invalid login form received')
+				failed = True
 
 		form = AuthenticationForm()
 		log_sql_query()
-		return render(request, 'login.html', {'form': form}) #render is the main method which binds html template with data model. 
+		return render(request, 'login.html', {'form': form, "failed": failed}) #render is the main method which binds html template with data model. 
 		#the last argument to this function is py dict which can be accessed in the template using django template scripting language 
 
 

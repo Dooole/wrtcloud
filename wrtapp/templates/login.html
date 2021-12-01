@@ -31,6 +31,11 @@
                                 <!-- Sign in form -->
                                 <form method="POST">
                                     {% csrf_token %}
+                                    {% if failed %}
+                                    <div class="form-floating mb-3">
+                                        <label for="floatingInputUsername">Invalid username or password!</label>
+                                    </div>
+                                    {% endif %}
                                     <div class="form-floating mb-3">
                                         <label for="floatingInputUsername">Username</label>
                                         <input type="text" class="form-control" id="floatingInputUsername" placeholder="Username" name="username" autofocus autocapitalize="none" autocomplete="username" maxlength="150" required id="id_username" required data-validation-required-message="Please, enter your username">
