@@ -4,10 +4,38 @@
 {% load static %}  
 <h1>Tools</h1>
 <br>
-<div class="container">
-    <h2>Tool 1</h2>
-    <div class="row">
-        <p>Tool 1 placeholder</p>
-    </div>
+<h2>Latest provisioning summary</h2>
+<div class="basetable">
+<table class="table table-striped table-bordered table-sm">
+    <thead class="thead-dark">
+        <tr>
+            <th>MAC</th>
+            <th>Model</th>
+            <th>Hostname</th>
+            <th>IP</th>
+            <th>Netmask</th>
+            <th>Gateway</th>
+            <th>DNS1</th>
+            <th>DNS2</th>
+            <th>Date</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for summ in summary %}
+        <tr>
+            <td>{{ summ.mac }}</td>
+            <td>{{ summ.model }}</td>
+            <td>{{ summ.hostname }}</td>
+            <td>{{ summ.ip }}</td>
+            <td>{{ summ.netmask }}</td>
+            <td>{{ summ.gateway }}</td>
+            <td>{{ summ.dns1 }}</td>
+            <td>{{ summ.dns2 }}</td>
+            <td>{{ summ.date }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 </div>
+<a href="/wrtapp/tools/refresh" type="button" class="btn btn-primary"><i class="fa fa-refresh"></i>Refresh</a>
 {% endblock %}

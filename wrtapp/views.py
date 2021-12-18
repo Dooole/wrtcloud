@@ -23,7 +23,7 @@ from wrtapp.models import Log
 from django.http import HttpResponseForbidden
 
 # Built-in DB module, which uses DB connector to manage DB and provides an API to it.
-from django.db import connection
+from django.db import connection, transaction
 from django.db import reset_queries
 from django.db.models import Q
 
@@ -551,6 +551,51 @@ class ToolsView:
 			return redirect('/wrtapp/errors/forbidden')
 
 		return render(request, 'tools/index.html', {'is_administrator': request.user.is_superuser, 'current_user': request.user.username})
+
+	def refresh(self, request):
+		if not request.user.is_authenticated:
+			return redirect('/wrtapp/login')
+
+		if not request.user.is_superuser:
+			return redirect('/wrtapp/errors/forbidden')
+
+		try:
+			cursor = connection.cursor()
+
+			sqlquery = ('SELECT '
+				'wrtapp_device.mac, '
+				'wrtapp_device.model, '
+				'wrtapp_configuration.hostname, '
+				'wrtapp_configuration.ip, '
+				'wrtapp_configuration.netmask, '
+				'wrtapp_configuration.gateway, '
+				'wrtapp_configuration.dns1, '
+				'wrtapp_configuration.dns2, '
+				'wrtapp_statistics.date '
+				'FROM '
+				'wrtapp_device '
+				'INNER JOIN '
+				'wrtapp_configuration '
+				'ON wrtapp_device.id = wrtapp_configuration.device_id '
+				'INNER JOIN '
+				'wrtapp_statistics '
+				'ON wrtapp_device.id = wrtapp_statistics.device_id '
+				'ORDER BY '
+				'wrtapp_statistics.date DESC;')
+
+			cursor.execute(sqlquery)
+			columns = [col[0] for col in cursor.description]
+			# Make dictionary from SQL query result
+			summary = [
+				dict(zip(columns, row))
+				for row in cursor.fetchall()
+			]
+
+			return render(request, 'tools/index.html', {'is_administrator': request.user.is_superuser, 'current_user': request.user.username, 'summary': summary})
+		except:
+			LOGGER.error('Failed to refresh summary')
+			log_sql_query()
+			return redirect('/wrtapp/tools/show')
 
 class AboutView:
 	def show(self, request):

@@ -38,7 +38,8 @@ urlpatterns = [ #url patterns specific to wrtapp django application
 	path('log/delete/<int:id>', views.logView.delete),
 	path('log/deleteall', views.logView.deleteall),
 	# Tools
-	path('tools/show', views.toolsView.show),
+	path('tools/show', views.toolsView.refresh),
+	path('tools/refresh', views.toolsView.refresh),
 	# About
 	path('about/show', views.aboutView.show),
 	# Contact
