@@ -7,7 +7,7 @@ from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import AuthenticationForm
 
-from django.contrib.postgres.search import SearchVector
+from django.contrib.postgres.search import SearchVector, SearchQuery
 
 from django import forms
 
@@ -25,6 +25,7 @@ from django.http import HttpResponseForbidden
 # Built-in DB module, which uses DB connector to manage DB and provides an API to it.
 from django.db import connection
 from django.db import reset_queries
+from django.db.models import Q
 
 from wrtapp.logger import Logger
 
@@ -121,9 +122,10 @@ class DeviceView:
 			if form.is_valid():
 				try:
 					searchstr = form.cleaned_data.get('search')
-					devices = Device.objects.annotate(
-						search=SearchVector('mac', 'model', 'name', 'description'),
-					).filter(search=searchstr)
+					devices = Device.objects.filter(Q(mac__icontains=searchstr) |
+						Q(model__icontains=searchstr) |
+						Q(name__icontains=searchstr) |
+						Q(description__icontains=searchstr))
 
 					log_sql_query()
 					return render(request, 'device/index.html', {'devices': devices, 'is_administrator': request.user.is_superuser, 'current_user': request.user.username})
@@ -213,9 +215,13 @@ class ConfigurationView:
 			if form.is_valid():
 				try:
 					searchstr = form.cleaned_data.get('search')
-					configs = Configuration.objects.annotate(
-						search=SearchVector('device__mac', 'hostname', 'ip', 'netmask', 'gateway', 'dns1', 'dns2'),
-					).filter(search=searchstr)
+					configs = Configuration.objects.filter(Q(device__mac__icontains=searchstr) |
+						Q(hostname__icontains=searchstr) |
+						Q(ip__icontains=searchstr) |
+						Q(netmask__icontains=searchstr) |
+						Q(gateway__icontains=searchstr) |
+						Q(dns1__icontains=searchstr) |
+						Q(dns2__icontains=searchstr))
 
 					log_sql_query()
 					return render(request, 'config/index.html', {'configs': configs, 'is_administrator': request.user.is_superuser, 'current_user': request.user.username})
@@ -285,9 +291,11 @@ class StatisticsView:
 			if form.is_valid():
 				try:
 					searchstr = form.cleaned_data.get('search')
-					stats = Statistics.objects.annotate(
-						search=SearchVector('device__mac', 'status', 'cpu_load', 'memory_usage'),
-					).filter(search=searchstr)
+					stats = Statistics.objects.filter(Q(device__mac__icontains=searchstr) |
+						Q(status__icontains=searchstr) |
+						Q(cpu_load__icontains=searchstr) |
+						Q(memory_usage__icontains=searchstr))
+
 					log_sql_query()
 					return render(request, 'stats/index.html', {'stats': stats, 'is_administrator': request.user.is_superuser, 'current_user': request.user.username})
 				except:
@@ -380,9 +388,7 @@ class UserView:
 			if form.is_valid():
 				try:
 					searchstr = form.cleaned_data.get('search')
-					users = User.objects.annotate(
-						search=SearchVector('username', 'email'),
-					).filter(search=searchstr)
+					users = User.objects.filter(Q(username__icontains=searchstr) | Q(email__icontains=searchstr))
 					log_sql_query()
 					return render(request, 'user/index.html', {'users': users, 'is_administrator': request.user.is_superuser, 'current_user': request.user.username})
 				except:
@@ -487,9 +493,11 @@ class LogView:
 			if form.is_valid():
 				try:
 					searchstr = form.cleaned_data.get('search')
-					logs = Log.objects.annotate(
-						search=SearchVector('device__mac', 'user__username', 'severity', 'message'),
-					).filter(search=searchstr)
+					logs = Log.objects.filter(Q(device__mac__icontains=searchstr) |
+						Q(user__username__icontains=searchstr) |
+						Q(severity__icontains=searchstr) |
+						Q(message__icontains=searchstr))
+
 					log_sql_query()
 					return render(request, 'log/index.html', {'logs': logs, 'is_administrator': request.user.is_superuser, 'current_user': request.user.username})
 				except:
