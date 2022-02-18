@@ -112,7 +112,7 @@ class DeviceView:
 		log_sql_query()
 		return render(request, 'device/index.html', {'devices': devices, 'is_administrator': request.user.is_superuser, 'current_user': request.user.username})
 
-	# Search using built-in posgres search feature
+	# Search using built-in postgres search feature
 	def search(self, request):
 		if not request.user.is_authenticated:
 			return redirect('/wrtapp/login')
