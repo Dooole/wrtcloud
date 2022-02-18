@@ -38,6 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.postgres',
     'sslserver',
     'wrtapp',
+    'rest_framework',
+    'wrtapi',
 ]
 
 MIDDLEWARE = [
@@ -163,3 +165,8 @@ LOGGING = {
 
 # Custom key - provisioning password
 PROVISIONING_PASSWORD = 'yJAFruh5RTuMVpvxRvc7xOBFGTrB3abd'
+
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10
+}

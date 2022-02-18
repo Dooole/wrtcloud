@@ -21,6 +21,7 @@ from wrtapp import views
 #if patern matches, specified handler is called
 urlpatterns = [
 	path('wrtapp/', include('wrtapp.urls')), #continue url pattern matching in included urls file
+	path('wrtapi/', include('wrtapi.urls')), #API module for the mobile app
 	re_path(r'^$', views.statsView.show), # show dashboard on empty URI
 	re_path(r'^.*$', views.errorsView.notfound), #pattern to match everything rest - not found error handler
 ]
